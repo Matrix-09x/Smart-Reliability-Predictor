@@ -3,101 +3,236 @@ import numpy  as np
 import pandas as pd 
 import math as m  
 import ast
+import tensorflow   as tf
+
 
 import matplotlib.pyplot as plt
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 
+from keras.models import Sequential
+from keras.layers import LSTM , Dense
+
 from sklearn.metrics import r2_score
 
 
+
+
 np.set_printoptions(threshold=np.inf)
-
-anomalies = pd.read_csv('labeled_anomalies.csv')
-Training = np.load('data\data/train/E-11.npy')
-Training_signal = Training[:,0]
+def Lstm_channel(channel) :
 
 
-
-window_size = 10
-input = []
-output = []
-
-for i,value in enumerate(Training_signal) :
-    if i < len(Training_signal) - window_size : 
-        input.append(Training_signal[i: i+window_size])
-        output.append(Training_signal[i+window_size])
-
-input = np.array(input)
-output = np.array(output)
-
-Testing  =  np.load('data\data/test/E-11.npy')
-testing_signal =  Testing[:,0]
-
-
-x_test = []
-y_test = []
+    anomalies = pd.read_csv('labeled_anomalies.csv').reset_index(drop=True)
+    Training = np.load(f'data\data/train/{channel}.npy')
+    Training_signal = Training[:,0]
 
 
 
+    split = int(len(Training_signal) * 0.8 )
 
-for i ,value in enumerate(testing_signal) :
-    if i < len(testing_signal) - window_size :
-        x_test.append(testing_signal[i:i+window_size])
-        y_test.append(testing_signal[i+window_size])
+    train_signal = Training_signal[:split]
 
+    validation_signal = Training_signal[split:]
 
-x_test = np.array(x_test)
-y_test = np.array(y_test)
+    # print(len(Training_signal))
+  
 
-
-anomalies = anomalies.set_index('chan_id')
-
-anomaly_zone = anomalies.loc['P-7','anomaly_sequences']
-
-list_data = ast.literal_eval(anomaly_zone)
-anomaly_array  = np.array(list_data,dtype= int)
-
-print(type(anomaly_array))
-print(anomaly_array)
-# print(anomaly_zone[0])
-# print(anomaly_array[0,1])
-# Total_anoamly = anomaly_array[0,1] - anomaly_array[0,0]  +  1
-# print(Total_anoamly)
-
-# model = LinearRegression()
-
-# model_2 = RandomForestRegressor()
+    window_size = 10
+    x_train = []
+    y_train = []
 
 
-# def precision_recall(model) : 
+    for i,value in enumerate(train_signal) :
+        if i < len(train_signal) - window_size : 
+            x_train.append(train_signal[i: i+window_size])
+            y_train.append(train_signal[i+window_size])
+            
 
 
-#     model.fit(input,output)
 
-#     predictions = model.predict(x_test)
+    x_train = np.array(x_train)
+    input_lstm  = x_train.reshape(x_train.shape[0] , x_train.shape[1],1)
 
+    y_train = np.array(y_train)
 
-#     error = np.abs(y_test - predictions)
-
-#     error_mean = np.mean(error)
-#     # print(error_mean)
-#     error_std = np.std(error)
-#     # print(error_std)
-#     thrshold = error_mean + 0.5  *  error_std 
-#     # print(thrshold)
+    Testing  =  np.load(f'data\data/test/{channel}.npy')
+    testing_signal =  Testing[:,0]
 
 
-#     anomaly_indices = np.where(error > thrshold)[0]
+    x_test = []
+    y_test = []
+
+
+
+
+    for i ,value in enumerate(testing_signal) :
+        if i < len(testing_signal) - window_size :
+            x_test.append(testing_signal[i:i+window_size])
+            y_test.append(testing_signal[i+window_size])
+
+
+    x_test = np.array(x_test)
+    x_test_lstm = x_test.reshape(x_test.shape[0] , x_test.shape[1],1)
+    y_test = np.array(y_test)
+
+
+    print(np.shape(x_test))
+    print(np.shape(x_test_lstm))
+    x_validation = []
+    y_validation = []
+
+    for i,value in enumerate(validation_signal) :
+        if i < len(validation_signal) - window_size :
+            x_validation.append(validation_signal[i:i+window_size])
+            y_validation.append(validation_signal[i+window_size])
+
+
+    x_validation = np.array(x_validation)
+    x_validation_lstm = x_validation.reshape(x_validation.shape[0] , x_validation.shape[1],1)
+    y_validation = np.array(y_validation)
+
+    anomalies = anomalies.set_index('chan_id')
+
+    anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
+
+    list_data = ast.literal_eval(anomaly_zone)
+    anomaly_array  = np.array(list_data,dtype= int)
+
+
+    # Total_anoamly = anomaly_array[0,1] - anomaly_array[0,0]  +  1
+
+
+
+    lstm_model = Sequential([tf.keras.Input(shape = (window_size,1)) ,LSTM(50),Dense(1)])
+    lstm_model.compile(optimizer= 'adam' , loss = 'mse')
+
+    lstm_model.fit(input_lstm , y_train , epochs= 10 , batch_size= 32)
+
+    validation_predictions = lstm_model.predict(x_validation_lstm)
+
+    validation_predictions = validation_predictions.flatten()
+
+    error = np.abs(y_validation - validation_predictions)
+
+    mean = np.mean(error)
+    std = np.std(error)
+
+    threshold = mean + 2 * std
+
+
+    test_predictions = lstm_model.predict(x_test_lstm)
+
+    test_predictions = test_predictions.flatten()
+
+    test_error = np.abs(y_test - test_predictions)
+
+    anomaly_indices = np.where(test_error > threshold)[0]
+
+    anomaly_indices = anomaly_indices + window_size
+
+    print(f'Total anomalies dedected | {len(anomaly_indices)}')
+
+    plt.figure(figsize= (12,4))
+
+    plt.plot(test_error)
+    plt.axhline(y=threshold , linewidth = 2 , color = 'green' )
+
+    row  = anomalies.loc[channel]
+    anomaly_zone = eval(row['anomaly_sequences'])
+
+    for start,end in anomaly_zone :
+        plt.axvspan(start ,end , alpha = 0.3 , color = 'red')
+        print(start,end)
+
+    plt.xlabel('Test index')
+    plt.ylabel('Test error')
+    plt.tight_layout()
+    plt.show()
+
+    Total_anomaly = 0
+
+    for zone in anomaly_zone :
+        Total_anomaly += zone[1] - zone[0] + 1
+
+
+    tp = 0 
+    fp = 0
+    for anomaly in anomaly_indices : 
+
+       found = False
+      
+       for i in anomaly_array : 
+            if anomaly >= i[0] and anomaly <= i[1] :
+                found = True
+                tp +=  1
+                break
+
+       if not found :
+           fp +=1
+        
+    fn = Total_anomaly - tp 
+
+    precision = tp/(tp+fp)
+    recall = tp/(tp+fn)
+
+
+    print(f'Tp : {tp}')
+    print(f'Fp : {fp}')
+    print(f'Fn : {fn}')
+    print(f'Precision : {precision}')
+    print(f'Recall : {recall}')
+
+    result_list = [testing_signal , test_error , threshold , anomaly_indices , anomaly_zone , precision , recall ]
+    return result_list
+
+   
+
+
+channel = input('Enter the channel name : ')
+
+result = Lstm_channel(channel)
+
+
+
+# def precision_recall(model , x_train , x_test_data,**fitkwargs) : 
+
+
+    # model = LinearRegression()
+
+    # model_2 = RandomForestRegressor(random_state= 42)
+
+#     model.fit(x_train , output,**fitkwargs)
+
+#     predictions = model.predict(x_train)
+#     predictions = predictions.flatten()
+
+#     training_error  = np.abs(output - predictions)
+#     training_error_mean  = np.mean(training_error)
+#     training_error_std  = np.std(training_error)
+#     threshold = training_error_mean + 0.5 * training_error_std
+
+#     test_predictions  = model.predict(x_test_data)
+#     test_predictions = test_predictions.flatten()
+#     testing_error = np.abs(y_test - test_predictions)
+
+    
+#     anomaly_indices = np.where(testing_error > threshold)[0]
 #     anomaly_indices = anomaly_indices + window_size
-#     # print(anomaly_indices)
+
 
 #     tp =  len(anomaly_indices[(anomaly_indices >= anomaly_array[0,0]) & (anomaly_indices <= anomaly_array[0,1])])
 #     fp = len(anomaly_indices[(anomaly_indices < anomaly_array[0,0]) | (anomaly_indices > anomaly_array[0,1])])
 #     fn = Total_anoamly - tp
 #     tn = len(y_test) - tp - fp - fn
 
+#     print(f'Total anomaly dedected : {len(anomaly_indices)}')
+#     print(f'Tp : {tp}')
+#     print(f'Tn : {tn}')
+#     print(f'Fp : {fp}')
+#     print(f'Fn : {fn}')
+
+    
 #     precision  = tp/(tp+fp)
 #     recall = tp/(tp+fn)
    
@@ -106,14 +241,15 @@ print(anomaly_array)
 
 
 
-# precision_l , recall_l = precision_recall(model)
+
+
+# precision_l , recall_l = precision_recall(model,input,x_test)
 # print(f'Linear regression model | Precision : {precision_l} and Recall : {recall_l}')
-# precision_r , recall_r  = precision_recall(model_2)
+# precision_r , recall_r  = precision_recall(model_2,input,x_test)
 # print(f'Random Forest model | Precision : { precision_r} and Recall : {recall_r}')
 
-
-
-
+# precision_lstm , recall_lstm = precision_recall(lstm_model , input_lstm , x_test_lstm , epochs = 10 , batch_size = 32)
+# print(f'Lstm | Precision : {precision_lstm} , Recall | {recall_lstm}')
 
 
 
@@ -122,6 +258,14 @@ print(anomaly_array)
 
 
 # print(anomalies.loc[9])
+
+
+
+
+
+
+
+
 
 
 
