@@ -18,12 +18,13 @@ from sklearn.metrics import r2_score
 
 
 
+anomalies = pd.read_csv('labeled_anomalies.csv').reset_index(drop=True)
+anomalies = anomalies.set_index('chan_id')
+
 
 np.set_printoptions(threshold=np.inf)
 def Lstm_channel(channel) :
 
-
-    anomalies = pd.read_csv('labeled_anomalies.csv').reset_index(drop=True)
     Training = np.load(f'data\data/train/{channel}.npy')
     Training_signal = Training[:,0]
 
@@ -35,7 +36,7 @@ def Lstm_channel(channel) :
 
     validation_signal = Training_signal[split:]
 
-    # print(len(Training_signal))
+  
   
 
     window_size = 10
@@ -77,8 +78,8 @@ def Lstm_channel(channel) :
     y_test = np.array(y_test)
 
 
-    print(np.shape(x_test))
-    print(np.shape(x_test_lstm))
+    # print(np.shape(x_test))
+    # print(np.shape(x_test_lstm))
     x_validation = []
     y_validation = []
 
@@ -92,7 +93,6 @@ def Lstm_channel(channel) :
     x_validation_lstm = x_validation.reshape(x_validation.shape[0] , x_validation.shape[1],1)
     y_validation = np.array(y_validation)
 
-    anomalies = anomalies.set_index('chan_id')
 
     anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
 
@@ -131,24 +131,25 @@ def Lstm_channel(channel) :
 
     anomaly_indices = anomaly_indices + window_size
 
-    print(f'Total anomalies dedected | {len(anomaly_indices)}')
+    # print(f'Total anomalies dedected | {len(anomaly_indices)}')
 
-    plt.figure(figsize= (12,4))
+    fig,ax = plt.subplots(figsize= (12,4))
+    
 
-    plt.plot(test_error)
-    plt.axhline(y=threshold , linewidth = 2 , color = 'green' )
+    ax.plot(test_error)
+    ax.axhline(y=threshold , linewidth = 2 , color = 'green' )
 
     row  = anomalies.loc[channel]
     anomaly_zone = eval(row['anomaly_sequences'])
 
     for start,end in anomaly_zone :
-        plt.axvspan(start ,end , alpha = 0.3 , color = 'red')
-        print(start,end)
+        ax.axvspan(start ,end , alpha = 0.3 , color = 'red')
+        # print(start,end)
 
-    plt.xlabel('Test index')
-    plt.ylabel('Test error')
-    plt.tight_layout()
-    plt.show()
+    ax.set_xlabel('Test index')
+    ax.set_ylabel('Test error')
+    fig.tight_layout()
+  
 
     Total_anomaly = 0
 
@@ -177,21 +178,25 @@ def Lstm_channel(channel) :
     recall = tp/(tp+fn)
 
 
-    print(f'Tp : {tp}')
-    print(f'Fp : {fp}')
-    print(f'Fn : {fn}')
-    print(f'Precision : {precision}')
-    print(f'Recall : {recall}')
+    # print(f'Tp : {tp}')
+    # print(f'Fp : {fp}')
+    # print(f'Fn : {fn}')
+    # print(f'Precision : {precision}')
+    # print(f'Recall : {recall}')
 
-    result_list = [testing_signal , test_error , threshold , anomaly_indices , anomaly_zone , precision , recall ]
+    result_list = [testing_signal , test_error , threshold , anomaly_indices , anomaly_zone , precision , recall, fig]
     return result_list
 
    
 
 
-channel = input('Enter the channel name : ')
 
-result = Lstm_channel(channel)
+
+
+
+
+
+
 
 
 
