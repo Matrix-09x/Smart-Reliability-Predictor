@@ -4,6 +4,7 @@ import pandas as pd
 
 from V3 import Lstm_channel , anomalies
 
+from V1_V2 import  Proability_stimulator
 
 
 
@@ -37,9 +38,44 @@ if module  ==  "V1/V2 : Synthethic Reliability Stimulator" :
     """)
     st.markdown("---")
 
-    pass
+    n = st.number_input('Enter number of requests :',min_value= 1,value=100,step=1)
+    p = st.number_input('Enter the probability for failure :',min_value=0.1,max_value=1.0)
 
 
+    if st.button('Run Stimulation') :
+        with st.spinner('Running stimulation....') :
+            output = Proability_stimulator(n,p)
+
+        if 'error' in output :
+            st.error(output['error'])
+
+        else :
+            col1, col2 ,col3 =  st.columns(3)
+            col1.metric('Expected Failures' , f'{output["expected_mean"]:.1f}')
+            col2.metric('Observed Failures' , output['observed_failure'])
+            col3.metric('Accuracy', f'{output['accuracy']:.1f}%')
+
+
+            st.subheader("🚨 Anomaly Assesment")
+            col4 , col5 = st.columns(2)
+            col4.metric(output['metric_name'],output['metric_value'])
+            col5.metric('Status',output['status'])
+
+
+            st.subheader('🎯 Bayesian failure Attribution')
+
+            confusion_matrix  =output['confusion matrix']
+
+            data  = {
+                'Actual Db' : [confusion_matrix['Db']['Db correct prediction'],confusion_matrix['Db']['Server incorrect prediction for Db'],confusion_matrix['Db']['Network incorrected prediction for Db ']],
+                "Actual Server" : [confusion_matrix['Server']['Server correct prediction'],confusion_matrix['Server']['Db incorrect prediction for Server'],confusion_matrix['Server']['Network incorrect prediction for Server ']],
+                'Actual Network' : [confusion_matrix['Network']['Network correct prediction'],confusion_matrix['Network']['Db incorrect prediction for Network'],confusion_matrix['Network']['Server incorrect prediction for Network']]
+ 
+            }
+
+
+            df = pd.DateOffset(data,index=['Predicted:Db','Predicted:Network','Predicted:Server'])
+            st.table(df)
 
 
 else :
