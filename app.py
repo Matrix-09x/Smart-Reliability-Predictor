@@ -22,15 +22,15 @@ st.set_page_config(
 
 module = st.sidebar.radio(
     "Choose a module :",
-    ["V1/V2 : Synthethic Reliability Stimulator" , "V3 NASA Telemetry Deep Learning Analysis : "]
+    ["📊V1/V2 : Reliability Simulator" , "🛰️V3 — NASA Telemetry Analysis : "]
 )
 
 st.sidebar.title("🚀 Mission Control")
 
 st.sidebar.markdown('---')
 
-if module  ==  "V1/V2 : Synthethic Reliability Stimulator" :
-    st.title("📊 Probabilistic Failure Stimulator and Bayesian Attribution")
+if module  ==  "📊V1/V2 : Reliability Simulator" :
+    st.title("📊 Probabilistic Reliability Simulator and Bayesian Failure Attribution")
     st.markdown("""
     This section evaluates incoming request streams , calcualting  if anomaly rates 
     defy normal variance using **Poisson distribution** .It then applies a custom
@@ -38,8 +38,8 @@ if module  ==  "V1/V2 : Synthethic Reliability Stimulator" :
     """)
     st.markdown("---")
 
-    n = st.number_input('Enter number of requests :',min_value= 1,value=100,step=1)
-    p = st.number_input('Enter the probability for failure :',min_value=0.1,max_value=1.0)
+    n = st.number_input('Number of Requests :',min_value= 1,value=100,step=1)
+    p = st.number_input('Failure of Probability :',min_value=0.0000000001,max_value=1.0)
 
 
     if st.button('Run Stimulation') :
@@ -67,15 +67,41 @@ if module  ==  "V1/V2 : Synthethic Reliability Stimulator" :
             confusion_matrix  =output['confusion matrix']
 
             data  = {
-                'Actual Db' : [confusion_matrix['Db']['Db correct prediction'],confusion_matrix['Db']['Server incorrect prediction for Db'],confusion_matrix['Db']['Network incorrected prediction for Db ']],
-                "Actual Server" : [confusion_matrix['Server']['Server correct prediction'],confusion_matrix['Server']['Db incorrect prediction for Server'],confusion_matrix['Server']['Network incorrect prediction for Server ']],
-                'Actual Network' : [confusion_matrix['Network']['Network correct prediction'],confusion_matrix['Network']['Db incorrect prediction for Network'],confusion_matrix['Network']['Server incorrect prediction for Network']]
+                'Actual Db' : [confusion_matrix['Db']['Db correct prediction'],confusion_matrix['Db']['Network incorrected prediction for Db '],confusion_matrix['Db']['Server incorrect prediction for Db']],
+                'Actual Network' : [confusion_matrix['Network']['Db incorrect prediction for Network'],confusion_matrix['Network']['Network correct prediction'],confusion_matrix['Network']['Server incorrect prediction for Network']],
+                "Actual Server" : [confusion_matrix['Server']['Db incorrect prediction for Server'],confusion_matrix['Server']['Network incorrect prediction for Server '],confusion_matrix['Server']['Server correct prediction']]
  
             }
 
 
-            df = pd.DateOffset(data,index=['Predicted:Db','Predicted:Network','Predicted:Server'])
-            st.table(df)
+            df = pd.DataFrame(data,index=['Predicted : Db','Predicted : Network','Predicted : Server'])
+            st.dataframe(df, use_container_width=True)
+
+            st.markdown('---')
+            st.subheader('📝 Summary')
+
+            st.markdown(
+                f"""
+                The stimulator processed **{n:,}** requests with an assumed 
+                faliure probability of **{p:.1%}**.
+
+                - Expected failures : **{output['expected_mean']:.1f}**
+                - Observed failures : **{output['observed_failure']}**
+                - Bayesian attribution accuracy : **{output["accuracy"]:.1f}%**
+                - System assessment : **{output['status']}**
+
+                The Bayesian attribution matrix  estimated whether failures are
+                more consistent with **Database , Network and Server** conditions.
+
+                """
+            )
+
+
+
+
+
+
+
 
 
 else :
@@ -109,6 +135,41 @@ else :
         col2.metric('Recall' , f'{recall:.1%}')
         col3.metric('Anomalies Flagged',len(anomalies_indices))
 
-        st.pyplot(fig)
+        st.info(f'Analysis completed for telemetry channel: **{selected_channel}**')
+
+        st.subheader('📡 Telemetry channel')
+        st.line_chart(testing_signal,use_container_width=True)
+
+        st.subheader('🚨 Anomaly detection')
+
+        st.pyplot(fig,use_container_width=True)
+
+
+
+
+        st.markdown('---')
+
+        st.subheader('📝 Summary')
+
+        st.markdown(
+            f"""
+            
+            The LSTM model NASA Telemetry Channel analyzed **{selected_channel} and flagged **{len(anomalies_indices):,}**
+            observations as potentially anomalous.
+
+            - **Precision:** {precison:.1%}
+            - **Recall** {recall:.1%}
+            - **Detection threshold:** {threshold:.6f}   
+                
+            An observation is flagged when the models prediction error exceeds the  automatically  calculated
+            anomaly threshold
+
+            """
+
+
+        )
 
     
+        
+
+
