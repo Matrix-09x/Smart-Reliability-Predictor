@@ -39,7 +39,7 @@ if module  ==  "📊V1/V2 : Reliability Simulator" :
     st.markdown("---")
 
     n = st.number_input('Number of Requests :',min_value= 1,value=100,step=1)
-    p = st.number_input('Failure of Probability :',min_value=0.0000000001,max_value=1.0)
+    p = st.number_input('Failure of Probability :',min_value=0.1,max_value=1.0)
 
 
     if st.button('Run Stimulation') :

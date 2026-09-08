@@ -122,16 +122,69 @@ def Lstm_channel(channel) :
 
 
     test_predictions = lstm_model.predict(x_test_lstm)
-
     test_predictions = test_predictions.flatten()
 
+    # y_test_anomaly = y_test[5350 : 6080]
+    # test_predictions_anomaly = test_predictions[5350 : 6080]
+
+
+
+
+    # plt.plot(y_test_anomaly,color= 'blue')
+    # plt.plot(test_predictions_anomaly,color = 'green')
+    # plt.xlabel('Time')
+    # plt.ylabel('Telemetry')
+    # plt.legend()
+    # plt.show()
+
     test_error = np.abs(y_test - test_predictions)
+    test_error_anomaly = test_error[5350:6800]
+    plt.plot(test_error_anomaly)
+    plt.axhline(threshold,linewidth = 0.4,color = 'red')
+    plt.xlabel('Time')
+    plt.ylabel('Test error')
+    
+    plt.plot()
+    plt.show()
 
-    anomaly_indices = np.where(test_error > threshold)[0]
 
-    anomaly_indices = anomaly_indices + window_size
+    continouous_anomalies = []
+  
+    test_error_count = 0
+    streak_start = None
+    
+    for index,err in enumerate(test_error) :
+        if err > threshold :
 
-    # print(f'Total anomalies dedected | {len(anomaly_indices)}')
+            if test_error_count == 0 :
+                streak_start  = index 
+            test_error_count +=1
+
+
+        else :
+            if test_error_count >= 3 :
+                continouous_anomalies.extend(range(streak_start , index))
+
+            streak_start = None
+            test_error_count = 0 
+
+           
+                
+
+
+    if test_error_count >=3 :
+        continouous_anomalies.extend(range(streak_start,index+1))
+
+        
+    continouous_anomalies  = np.array(continouous_anomalies)
+
+
+    
+    # anomaly_indices = np.where(test_error > threshold)[0]
+
+    continouous_anomalies = continouous_anomalies + window_size
+
+    print(f'Total anomalies dedected | {len(continouous_anomalies)}')
 
     fig,ax = plt.subplots(figsize= (12,4))
     
@@ -159,7 +212,7 @@ def Lstm_channel(channel) :
 
     tp = 0 
     fp = 0
-    for anomaly in anomaly_indices : 
+    for anomaly in continouous_anomalies : 
 
        found = False
       
@@ -174,24 +227,27 @@ def Lstm_channel(channel) :
         
     fn = Total_anomaly - tp 
 
-    precision = tp/(tp+fp)
-    recall = tp/(tp+fn)
+    
+    precision = tp/(tp+fp)  if (tp+fp) > 0 else 0 
+    recall = tp/(tp+fn) if (tp+fn) > 0 else 0
 
 
-    # print(f'Tp : {tp}')
-    # print(f'Fp : {fp}')
-    # print(f'Fn : {fn}')
-    # print(f'Precision : {precision}')
-    # print(f'Recall : {recall}')
+    print(f'Tp : {tp}')
+    print(f'Fp : {fp}')
+    print(f'Fn : {fn}')
+    print(f'Precision : {precision}')
+    print(f'Recall : {recall}')
 
-    result_list = [testing_signal , test_error , threshold , anomaly_indices , anomaly_zone , precision , recall, fig]
-    return result_list
+    result_list = [testing_signal , test_error , threshold , continouous_anomalies , anomaly_zone , precision , recall, fig]
+    
+    # return result_list
 
    
 
 
 
 
+Lstm_channel('E-8')
 
 
 
