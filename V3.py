@@ -124,21 +124,21 @@ def Lstm_channel(channel) :
     test_predictions = lstm_model.predict(x_test_lstm)
     test_predictions = test_predictions.flatten()
 
-    # y_test_anomaly = y_test[5350 : 6080]
-    # test_predictions_anomaly = test_predictions[5350 : 6080]
+    y_test_anomaly = y_test[5650 : 5900]
+    test_predictions_anomaly = test_predictions[5650 : 5900]
 
 
 
 
-    # plt.plot(y_test_anomaly,color= 'blue')
-    # plt.plot(test_predictions_anomaly,color = 'green')
-    # plt.xlabel('Time')
-    # plt.ylabel('Telemetry')
-    # plt.legend()
-    # plt.show()
+    plt.plot(y_test_anomaly,color= 'blue')
+    plt.plot(test_predictions_anomaly,color = 'green')
+    plt.xlabel('Time')
+    plt.ylabel('Telemetry')
+    plt.legend()
+    plt.show()
 
     test_error = np.abs(y_test - test_predictions)
-    test_error_anomaly = test_error[5350:6800]
+    test_error_anomaly = test_error[5650:5900]
     plt.plot(test_error_anomaly)
     plt.axhline(threshold,linewidth = 0.4,color = 'red')
     plt.xlabel('Time')
@@ -183,6 +183,26 @@ def Lstm_channel(channel) :
     # anomaly_indices = np.where(test_error > threshold)[0]
 
     continouous_anomalies = continouous_anomalies + window_size
+    fn_indices_list = []
+    for index , i in enumerate(test_error) :
+        if index >= 5390 and index <= 6012 :
+            if index not in continouous_anomalies :
+                fn_indices_list.append(index)
+
+     
+    
+    # fn_error_values = []
+    # for i in fn_indices_list :
+    #     fn_error_values.append(test_error[i])
+
+
+    # print(f'Fn error min : {np.min(fn_error_values)}')
+    # print(f'Fn error max : {np.max(fn_error_values)}')
+    # print(f'threshold : {threshold}')
+    
+    # print(f'Total fn indices :{len(fn_indices_list)}')
+
+    # print(f'Fn index list -- {fn_indices_list}')
 
     print(f'Total anomalies dedected | {len(continouous_anomalies)}')
 
