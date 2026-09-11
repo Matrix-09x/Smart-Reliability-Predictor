@@ -12,11 +12,10 @@ anomaly_array = np.array(list_data,dtype=int)
 
 Total_anomaly = 0
 for i in anomaly_array  :
-    start , end = i[0] , i[1]   
-    Total_anomaly += end - start + 1 
+    start , end = i[0] , i[1]
+    for x in range(start , end) :
+        print(x)
     
-
     
-
 
     

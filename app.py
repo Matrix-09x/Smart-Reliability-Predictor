@@ -9,7 +9,7 @@ from V1_V2 import  Proability_stimulator
 
 
 
-
+models = ['Linear Regression','Random Forest','Long Term Short Memory(LSTM)']
 channels = anomalies.index.to_list()
 # print(channels)
 
@@ -112,7 +112,10 @@ else :
     """)
     st.markdown("---")
 
+    st.selectbox('Choose Model for the Anaylsis :',models)
+    
 
+    st.markdown("---")
 
     selected_channel = st.selectbox(
         'Choose Telemetry Channel:',
