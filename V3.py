@@ -141,13 +141,13 @@ def Lstm_channel(channel) :
 
     test_error = np.abs(y_test - test_predictions)
     # test_error_anomaly = test_error[5400:6023]
-    plt.plot(test_error)
-    plt.axhline(threshold,linewidth = 0.4,color = 'red')
-    plt.xlabel('Time')
-    plt.ylabel('Test error')
+    # plt.plot(test_error)
+    # plt.axhline(threshold,linewidth = 0.4,color = 'red')
+    # plt.xlabel('Time')
+    # plt.ylabel('Test error')
     
    
-    plt.show()
+    # plt.show()
 
 
     continouous_anomalies = []
@@ -202,14 +202,14 @@ def Lstm_channel(channel) :
         fn_error_values.append(test_error[i])
 
 
-    print(f'Fn error min : {np.min(fn_error_values)}')
-    print(f'Fn error max : {np.max(fn_error_values)}')
-    print(f'threshold : {threshold}')
+    # print(f'Fn error min : {np.min(fn_error_values)}')
+    # print(f'Fn error max : {np.max(fn_error_values)}')
+    # print(f'threshold : {threshold}')
     
-    print(f'Total fn indices : {len(fn_indices_list)}')
-    print(f'fn {fn_indices_list}')
+    # print(f'Total fn indices : {len(fn_indices_list)}')
+    # print(f'fn {fn_indices_list}')
 
-    print(f'Total anomalies dedected | {len(continouous_anomalies)}')
+    # print(f'Total anomalies dedected | {len(continouous_anomalies)}')
 
     fig,ax = plt.subplots(figsize= (12,4))
     
@@ -263,13 +263,13 @@ def Lstm_channel(channel) :
     recall = tp/(tp+fn) if (tp+fn) > 0 else 0
 
 
-    print(f'Tp : {tp}')
-    print(f'Fp : {fp}')
-    print(f'Fn : {fn}')
-    print(f'Precision : {precision}')
-    print(f'Recall : {recall}')
-    print(f'Threshold : {threshold}')
-    print(f'Continuoas anomalies : {continouous_anomalies}')
+    # print(f'Tp : {tp}')
+    # print(f'Fp : {fp}')
+    # print(f'Fn : {fn}')
+    # print(f'Precision : {precision}')
+    # print(f'Recall : {recall}')
+    # print(f'Threshold : {threshold}')
+    # print(f'Continuoas anomalies : {continouous_anomalies}')
 
     result_list = [testing_signal , test_error , threshold , continouous_anomalies , anomaly_zone , precision , recall, fig]
     return result_list
@@ -280,55 +280,132 @@ def Lstm_channel(channel) :
 Lstm_channel('F-7')
 
 
-
-
-
-
-
-
-# def precision_recall(model , x_train , x_test_data,**fitkwargs) : 
-
-
-    # model = LinearRegression()
-
-    # model_2 = RandomForestRegressor(random_state= 42)
-
-#     model.fit(x_train , output,**fitkwargs)
-
-#     predictions = model.predict(x_train)
-#     predictions = predictions.flatten()
-
-#     training_error  = np.abs(output - predictions)
-#     training_error_mean  = np.mean(training_error)
-#     training_error_std  = np.std(training_error)
-#     threshold = training_error_mean + 0.5 * training_error_std
-
-#     test_predictions  = model.predict(x_test_data)
-#     test_predictions = test_predictions.flatten()
-#     testing_error = np.abs(y_test - test_predictions)
+def Random_forest(channel) :
+    Training  = np.load(f'data\data/train{channel}.npy')
+    testing = np.load(f'data\data/train{channel}.npy')
 
     
-#     anomaly_indices = np.where(testing_error > threshold)[0]
-#     anomaly_indices = anomaly_indices + window_size
+    Training_signal = Training[:,0]
+
+    split = int(len(Training_signal * 0.8))
+
+    train_signal = Training_signal[:split]
+    validation_signal = Training_signal[split:]
+
+    window_size = 10
+    x_train = []
+    y_train = []
+
+    for i,value in enumerate(train_signal) :
+        if i <len(train_signal)- window_size :
+            x_train.append(train_signal[i+i+window_size])
+            y_train.append(train_signal[i+window_size])
+
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
 
 
-#     tp =  len(anomaly_indices[(anomaly_indices >= anomaly_array[0,0]) & (anomaly_indices <= anomaly_array[0,1])])
-#     fp = len(anomaly_indices[(anomaly_indices < anomaly_array[0,0]) | (anomaly_indices > anomaly_array[0,1])])
-#     fn = Total_anoamly - tp
-#     tn = len(y_test) - tp - fp - fn
+    x_validation = []
+    y_validation = []
 
-#     print(f'Total anomaly dedected : {len(anomaly_indices)}')
-#     print(f'Tp : {tp}')
-#     print(f'Tn : {tn}')
-#     print(f'Fp : {fp}')
-#     print(f'Fn : {fn}')
+    for i,value in enumerate(validation_signal):
+        if i < len(validation_signal) + window_size :
+            x_validation.append(i,i+window_size)
+            y_validation.append(i+window_size)
+
+    x_validation = np.array(x_validation)
+    y_validation = np.array(y_validation)
+
+    testing_signal = testing[:0]
+     
+    x_test = []
+    y_test = []
+
+    for i,value in enumerate(testing_signal) :
+        if i < len(testing_signal)- window_size :
+            x_test.append(i,i+window_size)
+            y_test.append(i+window_size)
+
+
+
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+
+    anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
+
+    list_data = ast.literal_eval(anomaly_zone)
+    anomaly_zone = np.array(list_data,dtype=int)
+
+
+    model = RandomForestRegressor(n_estimators=50,random_state=42,n_jobs=-1)
+    model.fit(x_train,y_train)
+
+    validation_predictions = model.predict(validation_signal)
+
+    validation_predictions = validation_predictions.flatten()
+
+    validation_error = np.abs(y_validation - validation_predictions)
+
+    mean = np.mean(validation_error)
+    std = np.std(validation_error)
+
+    threshold = mean + 3*std 
+    
+
+    test_predictions = model.predict(y_test)
+    test_predictions = test_predictions.flatten()
+
+    test_error = np.abs(y_test-test_predictions)
+
+    continuous_anomalies = []
+    test_error_count = 0
+    streak_Start = None
+
+    for index,value in enumerate(test_error) :
+        if value > threshold :
+            if test_error_count == 0 :
+                streak_Start =  index
+            test_error_count += 1
+
+        else :
+          if test_error_count >= 3 :
+              continuous_anomalies.extend(range(streak_Start,index))
+
+
+          streak_Start = None 
+          test_error_count = 0
+
+
+    if test_error_count >= 3 :
+        continuous_anomalies.extend(range(streak_Start,index+1))
+
+
+    continuous_anomalies = np.array(continuous_anomalies) + window_size 
+
+    fig ,ax = plt.subplots(figsize = (12,4))
+
+    ax.plot(test_error)
+    # ax.axhline(y=threshold, linewidth = )
+    
+
 
     
-#     precision  = tp/(tp+fp)
-#     recall = tp/(tp+fn)
+    
+
+
+    
+
+
+
+
+
+
+    
+
+
+
    
-#     return precision , recall
-    
+
 
 
 
