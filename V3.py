@@ -109,20 +109,121 @@ def Lstm_channel(channel) :
 
     lstm_model.fit(input_lstm , y_train , epochs= 10 , batch_size= 32)
 
-    validation_predictions = lstm_model.predict(x_validation_lstm)
+    validation_predictions = lstm_model.predict(x_validation_lstm,verbose= 0)
 
     validation_predictions = validation_predictions.flatten()
 
-    error = np.abs(y_validation - validation_predictions)
+    validation_error = np.abs(y_validation - validation_predictions)
 
-    mean = np.mean(error)
-    std = np.std(error)
+    mean = np.mean(validation_error)
+    std = np.std(validation_error)
 
-    threshold = mean + 2 * std
+    threshold_list = [1,1.5,2,2.5,3,3.5]
+
+    values_list = []
+    
+    for i in threshold_list :
+        threshold =  mean + i * std
+        values_list.append(threshold)
+
+
+
+    Predictions_diff_thresholds = []
+    
+    for i in values_list :
+        anomalies_indices = np.where(validation_error > i)[0]
+        Predictions_diff_thresholds.append(anomalies_indices)
+
+
+    flaggged_points_count = []
+    for i in Predictions_diff_thresholds :
+        count = len(i)
+        flaggged_points_count.append(count)
+
+
+    flaggged_points_count = np.array(flaggged_points_count)
+
+    Flagges_rate = flaggged_points_count/len(validation_error)
+
+
+    # print(values_list)
+    # print(Flagges_rate)s
+    
+    copy_validation_Signal = np.array(validation_signal)
+    validation_mean = np.mean(copy_validation_Signal)
+    print(f'mean | {validation_mean}')
+    validation_std = np.std(copy_validation_Signal)
+    print(f'Std | {validation_std}')
+    # print(f'Total length | {len(copy_validation_Signal)}')
+
+    copy_validation_Signal[304:309] += 4* validation_std
+
+    # print(f'Copy validation_signal | {copy_validation_Signal[290:320]}')
+
+    x_injected = []
+    y_injected = []
+
+    for i,value in enumerate(copy_validation_Signal) :
+        if i < len(copy_validation_Signal) - window_size :
+            x_injected.append(copy_validation_Signal[i:i+window_size])
+            y_injected.append(copy_validation_Signal[i+window_size])
+
+    x_injected = np.array(x_injected)
+    y_injected = np.array(y_injected)
+
+    x_injected_lstm = x_injected.reshape(x_injected.shape[0],x_injected.shape[1],1)
+    injected_predictions = lstm_model.predict(x_injected_lstm,verbose=0)
+
+    injected_predictions = injected_predictions.flatten()
+
+    injection_error = np.abs(y_injected - injected_predictions)
+
+    injected_threshold_results = []
+
+    for i in values_list :
+        indices = np.where(injection_error > i)[0]
+
+        original_indices = indices + window_size
+        injected_threshold_results.append(original_indices)
+
+    persistance = [1,2,3,5]
+
+
+    # for n in persistance :
+    #     validation_error_count = 0 
+    #     streak_start = None 
+
+    #     for index , err in  enumerate(validation_error) :
+    #         if err  > 
+    #         if validation_error_count == 0 :
+    #             streak_start = index 
+    #         test_error_count += 1
+
+        
+
+
+    for threshold , indices in zip(values_list , injected_threshold_results) :
+        correct_indices = len(indices[(indices >= 304) & (indices < 310)])
+
+
+        print(f'Threshold | {threshold}')
+        print(f'Detected Points | {indices}')
+        print(f'Correctly dedected points | {correct_indices}')
+        print(f'Number_dedected | {len(indices)}')
+        print()
+   
+
+
+
+    
+
+    
+    # threshold = mean + 2 * std
 
 
     test_predictions = lstm_model.predict(x_test_lstm)
     test_predictions = test_predictions.flatten()
+
 
     # y_test_anomaly = y_test[1240:1440]
     # test_predictions_anomaly = test_predictions[1240 : 1440]
@@ -187,19 +288,19 @@ def Lstm_channel(channel) :
      
     
     continouous_anomalies = continouous_anomalies + window_size
-    fn_indices_list = []
+    # fn_indices_list = []
 
-    for i in anomaly_array :
-        start ,end = i[0] , i[1]
+    # for i in anomaly_array :
+    #     start ,end = i[0] , i[1]
 
-        for index  in range(start ,end) :
+    #     for index  in range(start ,end+1) :
             
-                if index not in continouous_anomalies :
-                    fn_indices_list.append(index)
+    #             if index not in continouous_anomalies :
+    #                 fn_indices_list.append(index)
         
-    fn_error_values = []
-    for i in fn_indices_list :
-        fn_error_values.append(test_error[i])
+    # fn_error_values = []
+    # for i in fn_indices_list :
+    #     fn_error_values.append(test_error[i])
 
 
     # print(f'Fn error min : {np.min(fn_error_values)}')
@@ -251,6 +352,8 @@ def Lstm_channel(channel) :
            fp +=1
         
     fn = Total_anomaly - tp 
+
+
 
 
 
@@ -334,7 +437,7 @@ def Random_forest(channel) :
     anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
 
     list_data = ast.literal_eval(anomaly_zone)
-    anomaly_zone = np.array(list_data,dtype=int)
+    anomaly_array = np.array(list_data,dtype=int)
 
 
     model = RandomForestRegressor(n_estimators=50,random_state=42,n_jobs=-1)
@@ -385,7 +488,43 @@ def Random_forest(channel) :
     fig ,ax = plt.subplots(figsize = (12,4))
 
     ax.plot(test_error)
-    # ax.axhline(y=threshold, linewidth = )
+    ax.axhline(y=threshold, linewidth = 2 , color = 'green' )
+
+    row = anomalies.loc[channel]
+    anomaly_zone = eval(row['anomaly_sequences'])
+
+    for starr , end in anomaly_zone :
+        ax.axvspan(starr , end , alpha = 0.3 , color = 'red')
+
+    ax.set_xlabel('Test_index')
+    ax.set_ylabel('Test error')
+    fig.tight_layout()
+
+    total_anomaly = 0
+
+    for zone in anomaly_zone :
+        total_anomaly += zone[1] - zone[0] + 1
+
+    tp = 0
+    fp = 0
+
+    for i in continuous_anomalies :
+        found = False 
+
+        for x in anomaly_array :
+            if i > x[0] and i < x[1] :
+                tp +=1
+                break 
+
+        if not found :
+            fp+=1 
+
+
+    fn = total_anomaly - tp
+
+
+
+    precision = tp/(tp)
     
 
 
