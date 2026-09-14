@@ -151,9 +151,9 @@ def Lstm_channel(channel) :
     
     copy_validation_Signal = np.array(validation_signal)
     validation_mean = np.mean(copy_validation_Signal)
-    print(f'mean | {validation_mean}')
+    # print(f'mean | {validation_mean}')
     validation_std = np.std(copy_validation_Signal)
-    print(f'Std | {validation_std}')
+    # print(f'Std | {validation_std}')
     # print(f'Total length | {len(copy_validation_Signal)}')
 
     copy_validation_Signal[304:309] += 4* validation_std
@@ -188,29 +188,103 @@ def Lstm_channel(channel) :
 
     persistance = [1,2,3,5]
 
+    final_experiment_continous_anomalies = []
+    for n in persistance :
 
-    # for n in persistance :
-    #     validation_error_count = 0 
-    #     streak_start = None 
+        threshold_continuous_anomalies = []
+        for threshold in values_list :
+            validation_continuous_anomalies = []
+            validation_error_count = 0 
+            streak_start = None 
+            for index , err in  enumerate(injection_error) :
+                if err  >  threshold :
+                    if validation_error_count == 0 :
+                        streak_start = index 
+                    validation_error_count += 1
 
-    #     for index , err in  enumerate(validation_error) :
-    #         if err  > 
-    #         if validation_error_count == 0 :
-    #             streak_start = index 
-    #         test_error_count += 1
+                else :
+                    if validation_error_count >= n :
+                        validation_continuous_anomalies.extend(range(streak_start,index))
+                    streak_start = None 
+                    validation_error_count = 0
+
+            if validation_error_count >= n :
+                validation_continuous_anomalies.extend(range(streak_start , index+1))
+
+            threshold_continuous_anomalies.append(validation_continuous_anomalies)
 
         
+        final_experiment_continous_anomalies.append(threshold_continuous_anomalies)
+
+    
+    # print(f'Persistance and threshold combianation | {final_experiment_continous_anomalies}') 
+    
+
+    
+    
+    
+    for experiment in final_experiment_continous_anomalies :
+        tp_list = []
+        fp_list = []
+        fn_list = []
+        precision_list = []
+        recall_list = []
+        dedected_list_thresholds = []
+        for theshold in experiment :
+            tp = 0
+            fp = 0
+            dedected_list_points = []
+            for  i in theshold:
+        
+                if i >= 294 and i <= 298 :
+                    tp+=1  
+                    dedected_list_points.append(i) 
+
+                else :
+                    fp +=1 
+
+            fn = 5 - tp 
+
+            precision = tp/(tp+fp) if (tp+fp > 0) else  0 
+            recall = tp/(tp+fn) if (tp+fn > 0) else 0
+
+            tp_list.append(tp)
+            fp_list.append(fp)
+            fn_list.append(fn)
+            precision_list.append(precision)
+            recall_list.append(recall)
+            dedected_list_thresholds.append(dedected_list_points)
+
+            
+        print(f'Tp | {tp_list}')
+        print(f'Fp | {fp_list}')
+        print(f'Fn | {fn_list}')
+        print(f'Precision | {precision_list}')
+        print(f'Recall | {recall_list}')
+                    
+
+                    
+
+        
+    
+        
+            
+            
 
 
-    for threshold , indices in zip(values_list , injected_threshold_results) :
-        correct_indices = len(indices[(indices >= 304) & (indices < 310)])
+
+          
+    
+
+    # for threshold , indices in zip(values_list , injected_threshold_results) :
+    #     correct_indices = len(indices[(indices >= 304) & (indices < 310)])
 
 
-        print(f'Threshold | {threshold}')
-        print(f'Detected Points | {indices}')
-        print(f'Correctly dedected points | {correct_indices}')
-        print(f'Number_dedected | {len(indices)}')
-        print()
+    #     print(f'Threshold | {threshold}')
+    #     print(f'Detected Points | {indices}')
+    #     print(f'Correctly dedected points | {correct_indices}')
+    #     print(f'Number_dedected | {len(indices)}')
+    #     print()
    
 
 
@@ -524,8 +598,11 @@ def Random_forest(channel) :
 
 
 
-    precision = tp/(tp)
+    precision = tp/(tp+fp) if (tp+fp) > 0 else 0 
+    recall = tp(tp+fn) if (tp +fn) > 0 else 0 
+
     
+     
 
 
     
