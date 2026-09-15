@@ -222,14 +222,23 @@ def Lstm_channel(channel) :
 
     
     
+
+    combination_list_1  = []
+    combination_list_2 = []
+    combination_list_3 = []
+    combination_list_4 = []
+    comnination_list_5 = []
+    combination_list_6= []
+    for index,experiment in enumerate(final_experiment_continous_anomalies) :
+        persistance_value = persistance[index]
     
-    for experiment in final_experiment_continous_anomalies :
         tp_list = []
         fp_list = []
         fn_list = []
         precision_list = []
         recall_list = []
         dedected_list_thresholds = []
+        delay = []
         for theshold in experiment :
             tp = 0
             fp = 0
@@ -253,22 +262,110 @@ def Lstm_channel(channel) :
             fn_list.append(fn)
             precision_list.append(precision)
             recall_list.append(recall)
-            dedected_list_thresholds.append(dedected_list_points)
+            if len(dedected_list_points)  >=  persistance_value :
+                delay_value = dedected_list_points[persistance_value-1] - 294
+                dedected_list_thresholds.append(dedected_list_points[0])
+                delay.append(delay_value)
+            else :
+                dedected_list_thresholds.append('missed')
+                delay.append('Not found')
 
             
-        print(f'Tp | {tp_list}')
-        print(f'Fp | {fp_list}')
-        print(f'Fn | {fn_list}')
-        print(f'Precision | {precision_list}')
-        print(f'Recall | {recall_list}')
-                    
+        # print(f'Tp | {tp_list}')
+        # print(f'Fp | {fp_list}')
+        # print(f'Fn | {fn_list}')
+        # print(f'Precision | {precision_list}')
+        # print(f'Recall | {recall_list}')
+        # print(f'Dedected_points | {dedected_list_thresholds}')
+        # print(f'Delay | {delay}')
+        combination_list_1.append([tp_list[0],fp_list[0],fn_list[0],precision_list[0],recall_list[0],dedected_list_thresholds[0],delay[0]])
+        combination_list_2.append([tp_list[1],fp_list[1],fn_list[1],precision_list[1],recall_list[1],dedected_list_thresholds[1],delay[1]])
+        combination_list_3.append([tp_list[2],fp_list[2],fn_list[2],precision_list[2],recall_list[2],dedected_list_thresholds[2],delay[2]])
+        combination_list_4.append([tp_list[3],fp_list[3],fn_list[3],precision_list[3],recall_list[3],dedected_list_thresholds[3],delay[3]])
+        comnination_list_5.append([tp_list[4],fp_list[4],fn_list[4],precision_list[4],recall_list[4],dedected_list_thresholds[4],delay[4]])
+        combination_list_6.append([tp_list[5],fp_list[5],fn_list[5],precision_list[5],recall_list[5],dedected_list_thresholds[5],delay[5]])
 
-                    
+
+    print(combination_list_1)
+    print(combination_list_2)
+    print(combination_list_3)
+    print(combination_list_4)
+    print(comnination_list_5)
+    print(combination_list_6)
+
+    # for index,i in enumerate(zip(combination_list_1,combination_list_2,combination_list_3,combination_list_4,comnination_list_5,combination_list_6)):
+    #     print(i[0])
+        
+   
+        
+        # print(f'Index : {index}')
+
+    # Persistance_threshold_1 = {
+    #         'Tp'  : tp_list[0],
+    #         'Fp' : fp_list[0],
+    #         'Fn' : fn_list[0],
+    #         'Precison' : precision_list[0],
+    #         'Recall' : recall_list[0],
+    #         'Dedected Points' : dedected_list_thresholds[0],
+    #         'Delay' : delay[0]
+    #         }
 
         
+    # Persistance_threshold_2 = {
+    #     'Tp' : tp_list[1],
+    #     'Fp' : fp_list[1],
+    #     'Fn' : fn_list[1],
+    #     'Precision' : precision_list[1],
+    #     'Recall' : recall_list[1],
+    #     'Dedected Points' : dedected_list_thresholds[1],
+    #     'Delay' : delay[1]
+    # }
+
+    # Persistance_threshold_3 = {
+    #     'TP' : tp_list[2],
+    #     'Fp' : fp_list[2],
+    #     'Fn' : fn_list[2] ,
+    #     'Precison' : precision_list[2],
+    #     'Recall' : recall_list[2],
+    #     'Dedected Points' : dedected_list_thresholds[2],
+    #     'Delay' : delay[2]
+    # }
+
+    # Persistance_threshold_4 = {
+    #     'Tp' : tp_list[3],
+    #     'Fp' : fp_list[3] ,
+    #     'Fn' : fn_list[3],
+    #     'Precision' : precision_list[3],
+    #     'Recall' : recall_list[3],
+    #     'Dedected points' : dedected_list_thresholds[3],
+    #     'Delay' : delay[3],
+    # }
+
+    # Persistance_threshold_5 = {
+    #     'TP' : tp_list[4],
+    #     'FP' :fp_list[4],
+    #     'Fn' : fn_list[4],
+    #     'Precision' : precision_list[4],
+    #     'Recall' : recall_list[4],
+    #     'Dedected points' : dedected_list_thresholds[4],
+    #     'delay' : delay[4]
+    # }
+
+    # Persistance_threshold_6 = {
+    #     'TP' : tp_list[5],
+    #     'Fp' : fp_list[5],
+    #     'Fn' : fn_list[5],
+    #     'Precision' : precision_list[5],
+    #     'Recall' : recall_list[5],
+    #     'Dedected points' : dedected_list_thresholds[5],
+    #     'delay' : delay[5]
+    # }
+
+
+                    
+
+
     
-        
-            
             
 
 
