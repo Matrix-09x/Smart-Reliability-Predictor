@@ -285,82 +285,50 @@ def Lstm_channel(channel) :
         comnination_list_5.append([tp_list[4],fp_list[4],fn_list[4],precision_list[4],recall_list[4],dedected_list_thresholds[4],delay[4]])
         combination_list_6.append([tp_list[5],fp_list[5],fn_list[5],precision_list[5],recall_list[5],dedected_list_thresholds[5],delay[5]])
 
+    Total_combination_list = [combination_list_1,combination_list_2,combination_list_3,combination_list_4,comnination_list_5,combination_list_6]
 
-    print(combination_list_1)
-    print(combination_list_2)
-    print(combination_list_3)
-    print(combination_list_4)
-    print(comnination_list_5)
-    print(combination_list_6)
+    # print(combination_list_1)
+    # print(combination_list_2)
+    # print(combination_list_3)
+    # print(combination_list_4)
+    # print(comnination_list_5)
+    # print(combination_list_6)
+    # print()
+    
+    for combination in Total_combination_list :
+        combination_points = []
+        for index,i in combination :
+            points = 0 
+            penalty = 0
+            Total_points = 0
+            points += i[4] * 100
+            points += i[3] * 80
+            penalty  += i[6] * 1
+            if i != 'Not found' :
+                penalty += i[1] * 1
 
-    # for index,i in enumerate(zip(combination_list_1,combination_list_2,combination_list_3,combination_list_4,comnination_list_5,combination_list_6)):
-    #     print(i[0])
+            Total_points= points - penalty 
+            combination_points.append(Total_points)
+
+            
+
+
+
+
+
+            
+            
+
+                
+
+
+            
+
+
         
    
         
         # print(f'Index : {index}')
-
-    # Persistance_threshold_1 = {
-    #         'Tp'  : tp_list[0],
-    #         'Fp' : fp_list[0],
-    #         'Fn' : fn_list[0],
-    #         'Precison' : precision_list[0],
-    #         'Recall' : recall_list[0],
-    #         'Dedected Points' : dedected_list_thresholds[0],
-    #         'Delay' : delay[0]
-    #         }
-
-        
-    # Persistance_threshold_2 = {
-    #     'Tp' : tp_list[1],
-    #     'Fp' : fp_list[1],
-    #     'Fn' : fn_list[1],
-    #     'Precision' : precision_list[1],
-    #     'Recall' : recall_list[1],
-    #     'Dedected Points' : dedected_list_thresholds[1],
-    #     'Delay' : delay[1]
-    # }
-
-    # Persistance_threshold_3 = {
-    #     'TP' : tp_list[2],
-    #     'Fp' : fp_list[2],
-    #     'Fn' : fn_list[2] ,
-    #     'Precison' : precision_list[2],
-    #     'Recall' : recall_list[2],
-    #     'Dedected Points' : dedected_list_thresholds[2],
-    #     'Delay' : delay[2]
-    # }
-
-    # Persistance_threshold_4 = {
-    #     'Tp' : tp_list[3],
-    #     'Fp' : fp_list[3] ,
-    #     'Fn' : fn_list[3],
-    #     'Precision' : precision_list[3],
-    #     'Recall' : recall_list[3],
-    #     'Dedected points' : dedected_list_thresholds[3],
-    #     'Delay' : delay[3],
-    # }
-
-    # Persistance_threshold_5 = {
-    #     'TP' : tp_list[4],
-    #     'FP' :fp_list[4],
-    #     'Fn' : fn_list[4],
-    #     'Precision' : precision_list[4],
-    #     'Recall' : recall_list[4],
-    #     'Dedected points' : dedected_list_thresholds[4],
-    #     'delay' : delay[4]
-    # }
-
-    # Persistance_threshold_6 = {
-    #     'TP' : tp_list[5],
-    #     'Fp' : fp_list[5],
-    #     'Fn' : fn_list[5],
-    #     'Precision' : precision_list[5],
-    #     'Recall' : recall_list[5],
-    #     'Dedected points' : dedected_list_thresholds[5],
-    #     'delay' : delay[5]
-    # }
-
 
                     
 
@@ -572,7 +540,7 @@ def Random_forest(channel) :
 
     for i,value in enumerate(train_signal) :
         if i <len(train_signal)- window_size :
-            x_train.append(train_signal[i+i+window_size])
+            x_train.append(train_signal[i,i+window_size])
             y_train.append(train_signal[i+window_size])
 
     x_train = np.array(x_train)
@@ -698,9 +666,118 @@ def Random_forest(channel) :
     precision = tp/(tp+fp) if (tp+fp) > 0 else 0 
     recall = tp(tp+fn) if (tp +fn) > 0 else 0 
 
+    result_list = [testing_signal, test_error , threshold , continuous_anomalies , anomaly_zone , precision , recall , fig]
     
-     
+    return result_list 
 
+
+
+def Linear_Regression(channel) :
+    training = np.load(f'data\data/train{channel}.npy')
+    testing = np.load(f'data\data/train{channel}.npy')
+
+    training_signal = training[:,0]
+    testing_signal = testing[:0]
+
+    split = int(len(training_signal * 0.8))
+
+    train_set = training_signal[:split]
+    validation_set = training_signal[split:]
+
+    window_size = 10 
+
+    x_train =[]
+    y_train = []
+
+    for i , value in enumerate(train_set) :
+        if i < len(train_set) - window_size :
+            x_train.append(i,i+window_size)
+            y_train.append(i+window_size)
+
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
+
+    x_validation = []
+    y_validation = []
+
+    for i , value in enumerate(validation_set) :
+        if i < len(train_set) - window_size :
+            x_validation.append(i,i+window_size)
+            y_validation.append(i+window_size)
+
+    x_validation = np.array(x_validation)
+    y_validation = np.array(y_validation)
+
+    x_test = []
+    y_test = []
+
+    for i , value in enumerate(testing_signal) :
+        if i < len(train_set)  - window_size :
+            x_test.append(i,i+window_size)
+            y_test.append(i+window_size)
+
+    x_test = np.array(x_test)
+    y_test = np.array(y_test) 
+
+    anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
+
+    list_data = ast.literal_eval(anomaly_zone)
+    anomaly_array = np.array(list_data,dtype=int)
+
+
+    model = LinearRegression()
+    model.fit(x_train,y_train)
+
+    validation_predictions = model.predict(validation_set)
+    validation_predictions = validation_predictions.flatten()
+
+    validation_err = np.abs(y_validation - validation_predictions)
+
+    mean = np.mean(validation_err)
+    std = np.std(validation_err)
+
+    threshold = mean + 3*std 
+    
+    test_predictions = model.predict(y_test)
+    test_predictions = test_predictions.flatten()
+
+    test_error = np.abs(y_test - test_predictions)
+
+    continuous_anomalies = []
+    test_error_count = 0
+    streak_start = None
+
+    for index,value in enumerate(test_error) :
+        if value > threshold : 
+            if test_error_count == 0 :
+                streak_start = index 
+            test_error_count += 1
+
+        else :
+            if test_error_count >= 3 :
+                continuous_anomalies.extend(range(streak_start,index))
+    
+
+    
+    if  test_error_count >= 3 :
+        continuous_anomalies.extend(range(streak_start,index+1))
+
+    
+    continuous_anomalies = np.array(continuous_anomalies) + window_size
+
+    fig , ax = plt.subplots(figsize = (12,4))
+
+    ax.plot(test_error)
+    ax.axhline(y=threshold , linewidth = 2 , color = 'green')
+
+    row = anomalies.loc[channel]
+    anomaly_zone = eval(row['anomaly_sequences'])
+
+    # for
+    
+
+     
+    
 
     
     
