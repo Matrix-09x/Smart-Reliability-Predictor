@@ -773,10 +773,43 @@ def Linear_Regression(channel) :
     row = anomalies.loc[channel]
     anomaly_zone = eval(row['anomaly_sequences'])
 
-    # for
-    
+    for start , end in anomaly_zone :
+        ax.axvspan(start,end,alpha = 0.3 , color = 'red')
 
+    ax.set_xlabel('Test index')
+    ax.set_ylabel('Test error')
+    fig.tight_layout()
+
+    total_anomaly = 0
+
+    for i in anomaly_zone :
+        total_anomaly += i[1] - i[0] + 1
+
+    tp = 0
+    fp = 0
+
+    for i in continuous_anomalies :
+        found = False
+
+        for x in anomaly_array :
+            if i > x[0] and i < x[1] :
+                tp += 1
+                break
+        if not found :
+            fp += 1
+
+    fn = total_anomaly - tp
+
+    precision = tp/(tp+fp) if (tp+fp) > 0 else 0 
+
+    recall = tp(tp+fn) if (tp+fn) > 0 else 0 
+
+    result_list = [testing_signal,test_error,threshold,continuous_anomalies,anomaly_zone,precision,recall,fig]
+
+    return result_list
      
+
+    
     
 
     

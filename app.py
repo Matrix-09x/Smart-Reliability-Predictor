@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-from V3 import Lstm_channel , anomalies
+from V3 import Lstm_channel , anomalies , Linear_Regression ,Random_forest
 
 from V1_V2 import  Proability_stimulator
 
@@ -112,7 +112,7 @@ else :
     """)
     st.markdown("---")
 
-    st.selectbox('Choose Model for the Anaylsis :',models)
+    model_selected = st.selectbox('Choose Model for the Anaylsis :',models)
     
 
     st.markdown("---")
@@ -124,55 +124,103 @@ else :
     )
 
     if st.button("Run Analysis") :
-        with st.spinner('Training LSTM and analyzing telemetry..... this may take  a while'):
-            result = Lstm_channel(selected_channel)
+        if model_selected == 'Long Term Short Memory(LSTM)' :
 
-
-    
-
-        testing_signal , test_error , threshold , anomalies_indices , anomaly_zone , precison , recall , fig = result
-
-
-        col1 , col2 , col3  = st.columns(3)
-        col1.metric('Precision' , f'{precison:.1%}')
-        col2.metric('Recall' , f'{recall:.1%}')
-        col3.metric('Anomalies Flagged',len(anomalies_indices))
-
-        st.info(f'Analysis completed for telemetry channel: **{selected_channel}**')
-
-        st.subheader('📡 Telemetry channel')
-        st.line_chart(testing_signal,use_container_width=True)
-
-        st.subheader('🚨 Anomaly detection')
-
-        st.pyplot(fig,use_container_width=True)
-
-
-
-
-        st.markdown('---')
-
-        st.subheader('📝 Summary')
-
-        st.markdown(
-            f"""
             
-            The LSTM model NASA Telemetry Channel analyzed **{selected_channel} and flagged **{len(anomalies_indices):,}**
-            observations as potentially anomalous.
+            with st.spinner('Training LSTM and analyzing telemetry..... this may take  a while'):
+                result = Lstm_channel(selected_channel)
 
-            - **Precision:** {precison:.1%}
-            - **Recall** {recall:.1%}
-            - **Detection threshold:** {threshold:.6f}   
+
+        
+
+            testing_signal , test_error , threshold , anomalies_indices , anomaly_zone , precison , recall , fig = result
+
+
+            col1 , col2 , col3  = st.columns(3)
+            col1.metric('Precision' , f'{precison:.1%}')
+            col2.metric('Recall' , f'{recall:.1%}')
+            col3.metric('Anomalies Flagged',len(anomalies_indices))
+
+            st.info(f'Analysis completed for telemetry channel: **{selected_channel}**')
+
+            st.subheader('📡 Telemetry channel')
+            st.line_chart(testing_signal,use_container_width=True)
+
+            st.subheader('🚨 Anomaly detection')
+
+            st.pyplot(fig,use_container_width=True)
+
+
+
+
+            st.markdown('---')
+
+            st.subheader('📝 Summary')
+
+            st.markdown(
+                f"""
                 
-            An observation is flagged when the models prediction error exceeds the  automatically  calculated
-            anomaly threshold
+                The LSTM model NASA Telemetry Channel analyzed **{selected_channel} and flagged **{len(anomalies_indices):,}**
+                observations as potentially anomalous.
 
-            """
+                - **Precision:** {precison:.1%}
+                - **Recall** {recall:.1%}
+                - **Detection threshold:** {threshold:.6f}   
+                    
+                An observation is flagged when the models prediction error exceeds the  automatically  calculated
+                anomaly threshold
+
+                """
 
 
-        )
+            )
 
-    
+
+        if model_selected == 'Linear Regression' :
+
+            with st.spinner('Training Linear Regression and analyzing telemetry... this may take a while') :
+                result = Linear_Regression(selected_channel)
+
+            testing_signal , test_error , threshold , anomalies_indices , anomaly_zone , precison , recall , fig = result
+
+            col1 , col2,col3 = st.columns(3)
+            col1.metric('Precision' , f'{precison:.1%}')
+            col2.metric('Recall',f'{recall:.1%}')
+            col3.metric('Anomalies Flagged',len(anomalies_indices))
+
+            st.info(f'Analysis completed for telemetry channel : **{selected_channel}**')
+
+            st.subheader('📡 Telemetry channel')
+            st.line_chart(testing_signal,use_container_width=True)
+
+            st.subheader('🚨 Anomaly detection')
+
+            st.pyplot(fig,use_container_width=True)
+
+
+            st.markdown('---')
+
+            st.subheader('📝 Summary')
+
+            st.markdown(
+                f"""
+
+                The Linear regression model NASA Telemetry Channel analyzes **{selected_channel} and flagged **{len(anomalies_indices):,}**
+                observations as potentially anomalous.
+
+                - **Precision** {precison:.1%}
+                - **Recall** {recall:.1%}
+                - **Detection threshold:** {threshold:.6f}
+
+                An observation is flagged when the models prediction error ex
+
+          
+
+
+
+
+         """
+            )
         
 
 
