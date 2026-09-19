@@ -19,6 +19,8 @@
     
 
     
+
+
 # A = int(input('Enter the Quantity of keyboard'))
 # a = int(input('Enter the price of keyboard'))
 # B = int(input('Enter the Quantity of Monitor'))
@@ -57,26 +59,56 @@
 
 
 
-n = int(input('Enter the number '))
+# n = int(input('Enter the number '))
 
-p = n
+# p = n
 
-s = 0
+# s = 0
 
-while n > 0 :
+# while n > 0 :
     
-    r = n % 10 
-    s += r ** 3
-    n = n // 10 
+#     r = n % 10 
+#     s += r ** 3
+#     n = n // 10 
 
-if p == s :
-    print('armstrong')
-else :
-    print('not')
+# if p == s :
+#     print('armstrong')
+# else :
+#     print('not')
   
 
 
 
+# decimal_num = int(input("Enter a decimal number: "))
+
+# # Handle the edge case if the user inputs 0
+# if decimal_num == 0:
+#     binary_str = "0"
+# else:
+#     num = decimal_num
+#     binary_str = ""
+    
+#     # Loop until the number shrinks down to 0
+#     while num > 0:
+#         remainder = num % 2
+#         # Add the remainder to the FRONT of the string to reverse the order automatically
+#         binary_str = str(remainder) + binary_str
+#         num = num // 2
+
+# print(f"The binary equivalent of {decimal_num} is: {binary_str}")
 
 
+# n = int(input('Enter the number '))
 
+# a = 0 
+# b = 1 
+# for i in range(1,n) :
+#     print(a,end="")
+#     a,b = b ,b+a 
+# print()
+
+for i in range(0,5) :
+    for j in range(0,i) :
+        print(chr(65+j),end="")
+    print()
+   

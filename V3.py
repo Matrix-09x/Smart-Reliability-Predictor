@@ -271,13 +271,13 @@ def Lstm_channel(channel) :
                 delay.append('Not found')
 
             
-        # print(f'Tp | {tp_list}')
-        # print(f'Fp | {fp_list}')
-        # print(f'Fn | {fn_list}')
-        # print(f'Precision | {precision_list}')
-        # print(f'Recall | {recall_list}')
-        # print(f'Dedected_points | {dedected_list_thresholds}')
-        # print(f'Delay | {delay}')
+        print(f'Tp | {tp_list}')
+        print(f'Fp | {fp_list}')
+        print(f'Fn | {fn_list}')
+        print(f'Precision | {precision_list}')
+        print(f'Recall | {recall_list}')
+        print(f'Dedected_points | {dedected_list_thresholds}')
+        print(f'Delay | {delay}')
         combination_list_1.append([tp_list[0],fp_list[0],fn_list[0],precision_list[0],recall_list[0],dedected_list_thresholds[0],delay[0]])
         combination_list_2.append([tp_list[1],fp_list[1],fn_list[1],precision_list[1],recall_list[1],dedected_list_thresholds[1],delay[1]])
         combination_list_3.append([tp_list[2],fp_list[2],fn_list[2],precision_list[2],recall_list[2],dedected_list_thresholds[2],delay[2]])
@@ -309,6 +309,8 @@ def Lstm_channel(channel) :
 
             Total_points= points - penalty 
             combination_points.append(Total_points)
+
+            
 
             
 
@@ -519,7 +521,7 @@ def Lstm_channel(channel) :
    
 
 
-Lstm_channel('F-7')
+# Lstm_channel('F-7')
 
 
 def Random_forest(channel) :

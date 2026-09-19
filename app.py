@@ -160,7 +160,7 @@ else :
             st.markdown(
                 f"""
                 
-                The LSTM model NASA Telemetry Channel analyzed **{selected_channel} and flagged **{len(anomalies_indices):,}**
+                The LSTM model analyzed NASA Telemetry Channel  **{selected_channel} and flagged **{len(anomalies_indices):,}**
                 observations as potentially anomalous.
 
                 - **Precision:** {precison:.1%}
@@ -212,15 +212,61 @@ else :
                 - **Recall** {recall:.1%}
                 - **Detection threshold:** {threshold:.6f}
 
-                An observation is flagged when the models prediction error ex
+                An observation is flagged when the models prediction error exceeds the automatically  calculated
+                anomaly threshold
 
           
-
-
-
 
          """
             )
         
+
+        if model_selected ==  'Random Forest' :
+
+            with st.spinner('Training Random Forest model and analyzing telemetry.... this may take a while'):
+                result = Random_forest(selected_channel)
+
+            testing_signal , test_error , threshold , anomalies_indices , anomaly_zone , precison , recall , fig = result
+
+            col1 , col2 , col3 = st.columns(3)
+            col1.metric('Precision', f'{precison:.1%}')
+            col2.metric('Recall' , f'{recall:.1%}')
+            col3.metric('Anomalies Flagged',len(anomalies_indices))
+
+            st.info(f'Analysis completed for telemetry channel: **{selected_channel}**')
+
+            st.subheader('📡 Telemetry channel')
+            st.line_chart(testing_signal,use_container_width=True)
+
+            st.subheader('🚨 Anomaly detection')
+            st.pyplot(fig,use_container_width=True)
+
+            st.markdown('---')
+
+            st.subheader('📝 Summary')
+
+            st.markdown(
+                f"""
+                The Random Forest model analyzed NASA Telemetry Channel **{selected_channel}** and flagged **{len(anomalies_indices):,}**
+                observations as potentially anomalous.
+
+                - **Precision** {precison:.1%}
+                - **Recall** {recall:.1%}
+                - **Detection threshold** {threshold:.6f}
+               
+                An observation is flagged when the models prediction error exceeds the automatically calculated
+                anomaly threshold 
+
+                """
+                
+            )
+
+
+
+
+
+                    
+
+
 
 
