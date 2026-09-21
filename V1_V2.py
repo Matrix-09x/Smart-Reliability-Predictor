@@ -283,6 +283,7 @@ def Proability_stimulator(n,p) :
          output['metric_value'] = f'{z_score:.3f}'
          output['status'] = 'Normal' if  z_score_fabs < 2 else('Unusual,Alert' if z_score_fabs < 3 else('Abnormal, Risky'))
 
+   return output
 
 
    
@@ -318,6 +319,5 @@ def Proability_stimulator(n,p) :
 
 
 
-   return output
 
    
