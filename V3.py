@@ -68,6 +68,7 @@ def Lstm_channel(channel) :
 
 
     for i ,value in enumerate(testing_signal) :
+        
         if i < len(testing_signal) - window_size :
             x_test.append(testing_signal[i:i+window_size])
             y_test.append(testing_signal[i+window_size])
@@ -154,19 +155,34 @@ def Lstm_channel(channel) :
     # print(f'Total length | {len(copy_validation_Signal)}')
     
 
-    injected_anomalies  = [[150,155],[304,309],[405,410]]
+    scenario_list =[
+        ('spike',150,155),
+        ('spike',304,309),
+        ('spike',405,410),
+        ('level',200,220),
+        ('level',90,115)
+                    ]
+        
+
+  
     persistance = [1,2,3,5]
     all_scenario_metrics = []
 
-    for scenrio_id in injected_anomalies :
+    for scenario_type,first , second in scenario_list :
+
         copy_validation_Signal = np.array(validation_signal)    
         validation_std = np.std(copy_validation_Signal)
         validation_mean = np.mean(copy_validation_Signal) 
 
+        total = second - first 
 
-          
-        first , second = scenrio_id[0],scenrio_id[1]
-        copy_validation_Signal[first:second] += 4* validation_std
+        if scenario_type == 'spike' :
+            copy_validation_Signal[first:second] += 4 * validation_std
+
+        elif scenario_type == 'level' :
+            copy_validation_Signal[first:second] += 2 * validation_std
+        
+      
         
         # print(len(copy_validation_Signal))
 
@@ -257,14 +273,20 @@ def Lstm_channel(channel) :
                 dedected_list_points = []
                 for  i in theshold:
             
-                    if i >= first - 10 and i < second - 10 :
+                    if i >= first - window_size and i < second - window_size :
                         tp+=1  
                         dedected_list_points.append(i) 
 
                     else :
                         fp +=1 
 
-                fn = 5 - tp 
+                fn = total - tp 
+
+
+                if tp  > total :
+                    print('Warning: Tp exceeds total')
+                    print(f'Scenario {scenario_type},({first},{second})')
+                    print(f'Tp: {tp} , Total : {total}')
 
                 precision = tp/(tp+fp) if (tp+fp > 0) else  0 
                 recall = tp/(tp+fn) if (tp+fn > 0) else 0
@@ -274,22 +296,48 @@ def Lstm_channel(channel) :
                 fn_list.append(fn)
                 precision_list.append(precision)
                 recall_list.append(recall)
-                if len(dedected_list_points)  >=  persistance_value :
-                    delay_value = dedected_list_points[persistance_value-1] - (first-10)
+
+                alert_point = None 
+                previous_point = None
+                streak_count = 0
+
+                anomaly_start = first - window_size
+                anomaly_end = second - window_size
+
+                for point in sorted(theshold):
+                    if previous_point is not None and point == previous_point + 1 :
+                        streak_count += 1
+                    else :
+                        streak_count = 1
+
+                    if streak_count >= persistance_value :
+                        if anomaly_start <= point and point < anomaly_end :
+                            alert_point = point 
+                            break 
+
+                    previous_point = point
+
+                if alert_point is not None :
+                    delay_value = alert_point - anomaly_start
                     dedected_list_thresholds.append(dedected_list_points[0])
                     delay.append(delay_value)
-                else :
-                    dedected_list_thresholds.append('missed')
+
+                else : 
+                    dedected_list_thresholds.append('misses') 
                     delay.append('Not found')
 
-                
+               
+
+
             # print(f'Tp | {tp_list}')
             # print(f'Fp | {fp_list}')
             # print(f'Fn | {fn_list}')
-            # print(f'Precision | {precision_list}')
+            # print(f'Precison | {precision_list}')
             # print(f'Recall | {recall_list}')
-            # print(f'Dedected_points | {dedected_list_thresholds}')
+            # print(f'Dedected points | {dedected_list_thresholds}')
             # print(f'Delay | {delay}')
+            
+          
             combination_list_1.append([tp_list[0],fp_list[0],fn_list[0],precision_list[0],recall_list[0],dedected_list_thresholds[0],delay[0]])
             combination_list_2.append([tp_list[1],fp_list[1],fn_list[1],precision_list[1],recall_list[1],dedected_list_thresholds[1],delay[1]])
             combination_list_3.append([tp_list[2],fp_list[2],fn_list[2],precision_list[2],recall_list[2],dedected_list_thresholds[2],delay[2]])
@@ -372,243 +420,202 @@ def Lstm_channel(channel) :
         precision = tp/(tp+fp) if (tp+fp) != 0 else 0 
         recall = tp/(tp+fn)  if (tp+fn) != 0 else 0 
 
-        candidate['combined precison'] = precision 
+        f1_score = 2 * (precision * recall)/(precision + recall) if precision + recall != 0 else 0
+
+        candidate['combined precision'] = precision 
         candidate['combined recall'] = recall
-
-    print(len(combined_metrics))
-    print(combined_metrics[0])
-    print(combined_metrics[-1])
+        candidate['combined F1'] = f1_score
 
 
+    for index , candidate in enumerate(combined_metrics) :
+        scenario_precision = []
+        scenario_recall = []
+        scenario_f1 = []
 
-    
+        for scenrio in all_scenario_metrics :
+            sceanrio_candidate = scenrio['metrics'][index]
 
-    
+            pre = sceanrio_candidate['precison']
+            reca = sceanrio_candidate['recall']
+            f1 = 2 * (pre * reca)/(pre + reca) if pre + reca != 0 else 0 
+            scenario_precision.append(pre)  
+            scenario_recall.append(reca)
+            scenario_f1.append(f1)
 
-      
+        candidate['Average precision scenario'] = sum(scenario_precision)/len(scenario_precision)
+        candidate['Average recall scenario'] = sum(scenario_recall)/len(scenario_recall)
+        candidate['Average F1 score scenario'] = sum(scenario_f1)/len(scenario_f1)
 
+    for candidate in combined_metrics :
+        threshold = values_list[candidate['threshold']]
+        persistance_value = candidate['persistance']
 
-            
+        normal_error_count = 0
+        normal_streak_count = None
+        normal_anomalies = []
 
-    
+        for index,err in enumerate(validation_error) :
+            if err > threshold :
+                if normal_error_count == 0 :
+                    normal_streak_count = index 
+                normal_error_count += 1
 
-    
+            else :
+                if normal_error_count >= persistance_value :
+                    normal_anomalies.extend(range(normal_streak_count,index))
 
+                normal_error_count = 0
+                normal_streak_count = None
 
-
-            
-
-
-
-
-
-
-
-
-            
-            
-
-                
-
-
-            
-
-
-        
-   
-        
-        # print(f'Index : {index}')
-
-                    
-
-
-    
-            
+        if normal_error_count >= persistance_value :
+            normal_anomalies.extend(range(normal_streak_count,index+1))
 
 
+        candidate['normal false alarm rate'] = (len(normal_anomalies)/len(validation_error))
 
-          
-    
+ 
 
-    # for threshold , indices in zip(values_list , injected_threshold_results) :
-    #     correct_indices = len(indices[(indices >= 304) & (indices < 310)])
+    for candidate in combined_metrics :
+        print(
+            f"Threshold | {values_list[candidate['threshold']]:.4f}"
+            f"Persistance | {candidate['persistance']}"
+            f"TP | {candidate['combined tp']}"
+            f"FP | {candidate['combined fp']}"
+            f"FN | {candidate['combined fn']}"
+            f"Precision | {candidate['combined precision']:.4f}"
+            f"Recall | {candidate['combined recall']:.4f}"
+            f"F1| {candidate['combined F1']}"
+            f"Average precision scenario | {candidate['Average precision scenario']:.4f}"
+            f"Average recall scenario | {candidate['Average recall scenario']:.4f}"
+            f"Average F1 scenario | {candidate['Average F1 score scenario']:.4f}"
+            f"Normal false alarm rate | {candidate['normal false alarm rate']:.4%}"
 
+        )
 
-    #     print(f'Threshold | {threshold}')
-    #     print(f'Detected Points | {indices}')
-    #     print(f'Correctly dedected points | {correct_indices}')
-    #     print(f'Number_dedected | {len(indices)}')
-    #     print()
-   
-
-
-
-    
-
-    
-    # threshold = mean + 2 * std
-
-
-    test_predictions = lstm_model.predict(x_test_lstm)
-    test_predictions = test_predictions.flatten()
-
-
-    # y_test_anomaly = y_test[1240:1440]
-    # test_predictions_anomaly = test_predictions[1240 : 1440]
-
-
-
-
-    # plt.plot(y_test,color= 'blue')
-    # plt.plot(test_predictions,color = 'green')
-    # plt.axhline(threshold,color = 'red' , linewidth = 0.35)
-    # plt.xlabel('Time')
-    # plt.ylabel('Telemetry')
-    # plt.legend()
-    
-    # plt.show()
-
-    test_error = np.abs(y_test - test_predictions)
-    # test_error_anomaly = test_error[5400:6023]
-    # plt.plot(test_error)
-    # plt.axhline(threshold,linewidth = 0.4,color = 'red')
-    # plt.xlabel('Time')
-    # plt.ylabel('Test error')
-    
-   
-    # plt.show()
-
-
-    continouous_anomalies = []
   
-    test_error_count = 0
-    streak_start = None
+  
+    acceptable_candidate = []
+    for  candidate in combined_metrics :
+        if candidate['normal false alarm rate'] <= 0.005 and candidate['persistance'] >= 3   :
+             acceptable_candidate.append(candidate) 
+
+    if acceptable_candidate :
+            best_candidate = max(acceptable_candidate,key=lambda candidate : (candidate['combined F1']))
+
+    else :
+        best_candidate = min(combined_metrics,key = lambda candidate : (candidate['normal false alarm rate'],-candidate['combined F1']))
+
+
     
-    for index,err in enumerate(test_error) :
-        if err > threshold :
 
-            if test_error_count == 0 :
-                streak_start  = index 
-            test_error_count +=1
 
+
+            
+
+    selected_threshold = values_list[best_candidate['threshold']]
+    selected_persistance = best_candidate['persistance']
+
+    # print(best_candidate)
+    # print(f'Selected threshold | {selected_threshold}')
+    # print(f'Selected persistance | {selected_persistance}')
+
+    test_prediction = lstm_model.predict(x_test_lstm)
+    test_prediction = test_prediction.flatten()
+
+    test_err = np.abs(y_test - test_prediction)
+
+    print(f'Validation error -mean : {mean:.4f}, std: {std:.4f}')
+    print(f'Test error -mean : {np.mean(test_err):.4f} , std : {np.std(test_err):.4f}')
+   
+    row =anomalies.loc[channel]
+    anomaly_zone = ast.literal_eval(row['anomaly_sequences'])
+   
+ 
+
+    test_err_count = 0
+    streak_start = None
+    continuous_anomalies = []
+    for index,err in enumerate(test_err) :
+        if err > selected_threshold :
+
+            if test_err_count == 0 :
+                streak_start = index
+
+            test_err_count += 1 
 
         else :
-            if test_error_count >= 1 :
-                continouous_anomalies.extend(range(streak_start , index))
+            if test_err_count >= selected_persistance :
+                continuous_anomalies.extend(range(streak_start,index))
 
-            streak_start = None
-            test_error_count = 0 
+                streak_start = None
+                test_err_count = 0
 
-           
-                
+    if test_err_count >= selected_persistance :
+        continuous_anomalies.extend(range(streak_start,index+1))
 
+    continuous_anomalies = np.array(continuous_anomalies)
 
-    if test_error_count >=1 :
-        continouous_anomalies.extend(range(streak_start,index+1))
-
-        
-    continouous_anomalies  = np.array(continouous_anomalies)
-
-
-    
-    # anomaly_indices = np.where(test_error > threshold)[0]
-
-     
-    
-    continouous_anomalies = continouous_anomalies + window_size
-    # fn_indices_list = []
-
-    # for i in anomaly_array :
-    #     start ,end = i[0] , i[1]
-
-    #     for index  in range(start ,end+1) :
-            
-    #             if index not in continouous_anomalies :
-    #                 fn_indices_list.append(index)
-        
-    # fn_error_values = []
-    # for i in fn_indices_list :
-    #     fn_error_values.append(test_error[i])
-
-
-    # print(f'Fn error min : {np.min(fn_error_values)}')
-    # print(f'Fn error max : {np.max(fn_error_values)}')
-    # print(f'threshold : {threshold}')
-    
-    # print(f'Total fn indices : {len(fn_indices_list)}')
-    # print(f'fn {fn_indices_list}')
-
-    # print(f'Total anomalies dedected | {len(continouous_anomalies)}')
-
-    fig,ax = plt.subplots(figsize= (12,4))
-    
-
-    ax.plot(test_error)
-    ax.axhline(y=threshold , linewidth = 2 , color = 'green' )
-
-    row  = anomalies.loc[channel]
-    anomaly_zone = eval(row['anomaly_sequences'])
-
-    for start,end in anomaly_zone :
-        ax.axvspan(start ,end , alpha = 0.3 , color = 'red')
-        # print(start,end)
-
-    ax.set_xlabel('Test index')
-    ax.set_ylabel('Test error')
-    fig.tight_layout()
-  
+    continuous_anomalies = continuous_anomalies + window_size
 
     Total_anomaly = 0
+    for i in anomaly_zone :
+        Total_anomaly += i[1] - i[0] + 1
 
-    for zone in anomaly_zone :
-        Total_anomaly += zone[1] - zone[0] + 1
-
-
-    tp = 0 
-    fp = 0
-    for anomaly in continouous_anomalies : 
-
-       found = False
-      
-       for i in anomaly_array : 
-            if anomaly >= i[0] and anomaly <= i[1] :
-                found = True
-                tp +=  1
-                break
-
-       if not found :
-           fp +=1
-        
-    fn = Total_anomaly - tp 
-
-
-
-
-
-
-
-
-   
+ 
     
+    tp = 0
+    fp = 0
+    for anomaly in continuous_anomalies :
+        found  = False
+        
+        for zone in anomaly_zone :
+            start , end = zone[0] , zone[1]
+
+            if anomaly >= start and anomaly <= end :
+                tp += 1 
+                found = True 
+                break 
+
+        if not found :
+            fp += 1
+
+    fn = Total_anomaly - tp
+
+
+
     precision = tp/(tp+fp)  if (tp+fp) > 0 else 0 
-    recall = tp/(tp+fn) if (tp+fn) > 0 else 0
+    recall = tp/(tp+fn) if (tp+fn) > 0 else 0 
+
+    print(f'Tp | {tp}')
+    print(f'Fp | {fp}')
+    print(f'fn | {fn}')
+    print(f'Precision | {precision}')
+    print(f'Recall | {recall}')
+    print(f'Threshold | {selected_threshold}')
+    print(f'persistance | {selected_persistance}')
+    print(f'Best candidate | {best_candidate}')
 
 
-    # print(f'Tp : {tp}')
-    # print(f'Fp : {fp}')
-    # print(f'Fn : {fn}')
-    # print(f'Precision : {precision}')
-    # print(f'Recall : {recall}')
-    # print(f'Threshold : {threshold}')
-    # print(f'Continuoas anomalies : {continouous_anomalies}')
 
-    result_list = [testing_signal , test_error , threshold , continouous_anomalies , anomaly_zone , precision , recall, fig]
-    return result_list
+    # result_list = [testing_signal , test_error , threshold , continouous_anomalies , anomaly_zone , precision , recall, fig]
+    # return result_list
 
    
 
 
-Lstm_channel('F-7')
+Lstm_channel('E-8')
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def Random_forest(channel) :
