@@ -288,34 +288,7 @@ def Proability_stimulator(n,p) :
 
    
 
-         # print(f'Failures Expected |  {expected_mean}')
-         # print(f'Failure observed | {observed_failure}')
-         # print(f'Diffrerence | {difference}')
-         # print(f'Standard Deviation |  {standard_deviation}')
-         # print(f'Anomaly score | {z_score}')
-
-         
-
-
-      # print('CAUSE ATTRIBUTION (BAYESIAN)')
-      # print(f'Accuracy  | {Accuracy:.2f}%')
-      
-      # col  =  ["","Db","Network","Server"]
-
-      # table = [
-      #    ["DB" , Db_correceted , Db_Network_incorrect , Db_Server_incorrect] ,
-      #    ["Network" , Network_Db_incorrected , Network_corrected , Network_Server_incorrected],
-      #    ["Server" , Server_Db_incorrected , Server_Network_incorrect , Server_corrected]
-
-      # ]
-      # print('-------------Confusion Matrix---------------')
-      # print(f"{col[0]:<8} | {col[1]:<8} | {col[2]:<8} | {col[3]:<8}")
-      # print('-' * 41)
-
-      # for row in table :
-      #    print(f"{row[0]:<8} | {row[1]:<8} | {row[2]:<8} | {row[3]:<8}")
-
-
+  
 
 
 
