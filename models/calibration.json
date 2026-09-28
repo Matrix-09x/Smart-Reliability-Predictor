@@ -1,0 +1,1136 @@
+{
+    "P-1": {
+        "linear_regression": {
+            "threshold": 0.5734429370309535,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5175265161132651,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.27901943676069096,
+            "persistence": 3
+        }
+    },
+    "S-1": {
+        "linear_regression": {
+            "threshold": 1.1527513512062795,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.141038099656897,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.7487054468207986,
+            "persistence": 5
+        }
+    },
+    "E-1": {
+        "linear_regression": {
+            "threshold": 0.9557157776770328,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.9399852634102415,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.3729517059475468,
+            "persistence": 3
+        }
+    },
+    "E-2": {
+        "linear_regression": {
+            "threshold": 0.3620164405410033,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.35947109259353355,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.14962817734346612,
+            "persistence": 3
+        }
+    },
+    "E-3": {
+        "linear_regression": {
+            "threshold": 0.08923483573951899,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.18859988806853648,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.06770516438714357,
+            "persistence": 3
+        }
+    },
+    "E-4": {
+        "linear_regression": {
+            "threshold": 0.19468575669019464,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.13996646201168672,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.1114264179744105,
+            "persistence": 5
+        }
+    },
+    "E-5": {
+        "linear_regression": {
+            "threshold": 0.9557157776770326,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.9399852634102417,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.36715218248092135,
+            "persistence": 3
+        }
+    },
+    "E-6": {
+        "linear_regression": {
+            "threshold": 0.004667661442348787,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0043064206430799305,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0074321457466162855,
+            "persistence": 5
+        }
+    },
+    "E-7": {
+        "linear_regression": {
+            "threshold": 0.08804228877703449,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.08448974556055969,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.08767105345737986,
+            "persistence": 5
+        }
+    },
+    "E-8": {
+        "linear_regression": {
+            "threshold": 0.1542874996678713,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.12902692156247583,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.08480971682627399,
+            "persistence": 5
+        }
+    },
+    "E-9": {
+        "linear_regression": {
+            "threshold": 0.20370315589086274,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.18733954493186353,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.10483404060561988,
+            "persistence": 5
+        }
+    },
+    "E-10": {
+        "linear_regression": {
+            "threshold": 0.952405303431958,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.9750341733915369,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.5339675742450279,
+            "persistence": 3
+        }
+    },
+    "E-11": {
+        "linear_regression": {
+            "threshold": 0.9519997777835504,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.8887945150194198,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.3989831927034888,
+            "persistence": 3
+        }
+    },
+    "E-12": {
+        "linear_regression": {
+            "threshold": 0.9557157776770329,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.9399852634102418,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.38524146906916723,
+            "persistence": 3
+        }
+    },
+    "E-13": {
+        "linear_regression": {
+            "threshold": 0.6690253947902057,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5367841156318267,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.3712599502547451,
+            "persistence": 5
+        }
+    },
+    "A-1": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 5.995204332975845e-15,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 1.2874603272372553e-08,
+            "persistence": 3
+        }
+    },
+    "D-1": {
+        "linear_regression": {
+            "threshold": 0.10239977286337211,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.09608658774102628,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.11760965714314137,
+            "persistence": 5
+        }
+    },
+    "P-2": {
+        "linear_regression": {
+            "threshold": 0.05226680493540907,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.052331824214541384,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0646249047098309,
+            "persistence": 3
+        }
+    },
+    "P-3": {
+        "linear_regression": {
+            "threshold": 0.23617884482460824,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.22741763268128748,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.234777494558552,
+            "persistence": 3
+        }
+    },
+    "D-2": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 7.734825621936383e-08,
+            "persistence": 3
+        }
+    },
+    "D-3": {
+        "linear_regression": {
+            "threshold": 9.754182299069914e-05,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.007668844671024218,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.004656785196188592,
+            "persistence": 3
+        }
+    },
+    "D-4": {
+        "linear_regression": {
+            "threshold": 0.0007889802532415882,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.011686244551411148,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.005842907680146241,
+            "persistence": 3
+        }
+    },
+    "A-2": {
+        "linear_regression": {
+            "threshold": 0.5451478708853312,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5595415179084575,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.4015365035861742,
+            "persistence": 3
+        }
+    },
+    "A-3": {
+        "linear_regression": {
+            "threshold": 0.3467556694771507,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.3746278298996663,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.21794700873840817,
+            "persistence": 3
+        }
+    },
+    "A-4": {
+        "linear_regression": {
+            "threshold": 0.3727381018699296,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.3879310958192178,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.24360695204908922,
+            "persistence": 3
+        }
+    },
+    "G-1": {
+        "linear_regression": {
+            "threshold": 0.4234528896571107,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.47211932223343933,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.3240182755019697,
+            "persistence": 3
+        }
+    },
+    "G-2": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "D-5": {
+        "linear_regression": {
+            "threshold": 6.365997320274881e-05,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 9.655624293636477e-05,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.00018278729920084125,
+            "persistence": 3
+        }
+    },
+    "D-6": {
+        "linear_regression": {
+            "threshold": 0.1320820928704122,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.2424450356797024,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.09323255036970914,
+            "persistence": 5
+        }
+    },
+    "D-7": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 9.848155493436988e-09,
+            "persistence": 5
+        }
+    },
+    "F-1": {
+        "linear_regression": {
+            "threshold": 0.5783817520392784,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5058959114182647,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.2760669136685069,
+            "persistence": 3
+        }
+    },
+    "P-4": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "G-3": {
+        "linear_regression": {
+            "threshold": 0.0013463763542651552,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0008332535318769096,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0020153884337161684,
+            "persistence": 3
+        }
+    },
+    "T-1": {
+        "linear_regression": {
+            "threshold": 0.13518171734055065,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.06339266423467187,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.23637934552111103,
+            "persistence": 5
+        }
+    },
+    "T-2": {
+        "linear_regression": {
+            "threshold": 0.12564025080060037,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.055401373114520945,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.2625556687942676,
+            "persistence": 3
+        }
+    },
+    "D-8": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "D-9": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "F-2": {
+        "linear_regression": {
+            "threshold": 0.47553397949745624,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.4708058732589271,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.22365904482296112,
+            "persistence": 3
+        }
+    },
+    "G-4": {
+        "linear_regression": {
+            "threshold": 0.013421435457122195,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.012387232710786279,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.01017002418335619,
+            "persistence": 5
+        }
+    },
+    "T-3": {
+        "linear_regression": {
+            "threshold": 0.004249821376935036,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.00364775259488668,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.01099732500960084,
+            "persistence": 5
+        }
+    },
+    "D-11": {
+        "linear_regression": {
+            "threshold": 0.07830620818832272,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.5177694846821994,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.5294521173749146,
+            "persistence": 5
+        }
+    },
+    "D-12": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.011557178955537772,
+            "persistence": 3
+        }
+    },
+    "B-1": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "G-6": {
+        "linear_regression": {
+            "threshold": 6.947288212475572e-05,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5455297309696996,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.08872222319500155,
+            "persistence": 5
+        }
+    },
+    "G-7": {
+        "linear_regression": {
+            "threshold": 0.5712484989990957,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5443401849593543,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.33523888180842976,
+            "persistence": 5
+        }
+    },
+    "P-7": {
+        "linear_regression": {
+            "threshold": 0.21202879792212678,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.21536001326626497,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.24650780439067657,
+            "persistence": 2
+        }
+    },
+    "R-1": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 6.5503158452884236e-15,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 1.2874603272372553e-08,
+            "persistence": 3
+        }
+    },
+    "A-5": {
+        "linear_regression": {
+            "threshold": 0.0002943818501632928,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.00025440086834902604,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.00043841416645251923,
+            "persistence": 5
+        }
+    },
+    "A-6": {
+        "linear_regression": {
+            "threshold": 0.4881229769956513,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.3959482096959799,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.7916664635673276,
+            "persistence": 5
+        }
+    },
+    "A-7": {
+        "linear_regression": {
+            "threshold": 0.3538820083173812,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.23023288295389616,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.19989489968890592,
+            "persistence": 5
+        }
+    },
+    "D-13": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "A-8": {
+        "linear_regression": {
+            "threshold": 5.417228879777225e-06,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 6.541253341475859e-05,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0008420710220055066,
+            "persistence": 5
+        }
+    },
+    "A-9": {
+        "linear_regression": {
+            "threshold": 8.075172345533055e-05,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.005611965084004316,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.004197079045889082,
+            "persistence": 3
+        }
+    },
+    "F-3": {
+        "linear_regression": {
+            "threshold": 1.6800170103306795e-07,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5447791688098658,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.06871470562604066,
+            "persistence": 3
+        }
+    },
+    "M-6": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0,
+            "persistence": 3
+        }
+    },
+    "M-1": {
+        "linear_regression": {
+            "threshold": 1.0257901792194093,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.940457851311517,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.5035152750763923,
+            "persistence": 3
+        }
+    },
+    "M-2": {
+        "linear_regression": {
+            "threshold": 0.4530082296748852,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.45313401392068386,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.48380567794801155,
+            "persistence": 5
+        }
+    },
+    "S-2": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 3.0994415283203125e-06,
+            "persistence": 3
+        }
+    },
+    "P-10": {
+        "linear_regression": {
+            "threshold": 0.00324760061925738,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.003327356857433319,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.0021930629387550884,
+            "persistence": 3
+        }
+    },
+    "T-4": {
+        "linear_regression": {
+            "threshold": 0.7445562391739587,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.767503351897719,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.33981943382503543,
+            "persistence": 3
+        }
+    },
+    "T-5": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 5.912595252161743e-09,
+            "persistence": 3
+        }
+    },
+    "F-7": {
+        "linear_regression": {
+            "threshold": 1.6113597680250606,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.4653005432118709,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.7639095981444424,
+            "persistence": 5
+        }
+    },
+    "M-3": {
+        "linear_regression": {
+            "threshold": 0.26052492346747563,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.2012979156259364,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.39960579488065723,
+            "persistence": 5
+        }
+    },
+    "M-4": {
+        "linear_regression": {
+            "threshold": 0.44380171660756407,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.48637096760197485,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.2588433128785166,
+            "persistence": 5
+        }
+    },
+    "M-5": {
+        "linear_regression": {
+            "threshold": 0.6572592405789386,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.8120649769748068,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.40526628865448533,
+            "persistence": 5
+        }
+    },
+    "P-15": {
+        "linear_regression": {
+            "threshold": 0.013660696677866676,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.015061572404035394,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.022266971617251014,
+            "persistence": 5
+        }
+    },
+    "C-1": {
+        "linear_regression": {
+            "threshold": 0.23544686791334754,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.321538438304799,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.1833344572639762,
+            "persistence": 5
+        }
+    },
+    "C-2": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 2.177714260367111e-05,
+            "persistence": 3
+        }
+    },
+    "T-12": {
+        "linear_regression": {
+            "threshold": 0.11646175128541476,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.4442389303986349,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.09719660313464737,
+            "persistence": 5
+        }
+    },
+    "T-13": {
+        "linear_regression": {
+            "threshold": 0.0527723419101726,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.4462938146575345,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.2103808062971444,
+            "persistence": 1
+        }
+    },
+    "F-4": {
+        "linear_regression": {
+            "threshold": 0.23815559333107608,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.2431417949311232,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.13623101839465884,
+            "persistence": 5
+        }
+    },
+    "F-5": {
+        "linear_regression": {
+            "threshold": 0.2180389662116391,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.3162813013832258,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.23975988355850136,
+            "persistence": 3
+        }
+    },
+    "D-14": {
+        "linear_regression": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 7.039314918105808e-09,
+            "persistence": 3
+        }
+    },
+    "T-9": {
+        "linear_regression": {
+            "threshold": 0.24330388835774575,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.2566818144272834,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.09286358419362326,
+            "persistence": 3
+        }
+    },
+    "P-14": {
+        "linear_regression": {
+            "threshold": 0.00021270257344996075,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.00021698382768050345,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.00016957444439496828,
+            "persistence": 3
+        }
+    },
+    "T-8": {
+        "linear_regression": {
+            "threshold": 0.5291963493144394,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.5290283456723963,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.21980854131000577,
+            "persistence": 5
+        }
+    },
+    "P-11": {
+        "linear_regression": {
+            "threshold": 0.13704667096701562,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.13645085349766065,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.17174900247786695,
+            "persistence": 3
+        }
+    },
+    "D-15": {
+        "linear_regression": {
+            "threshold": 1.7221685427497775,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.883220095125218,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.783466940183692,
+            "persistence": 3
+        }
+    },
+    "D-16": {
+        "linear_regression": {
+            "threshold": 0.04358030727769191,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 0.0,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.014539276202498121,
+            "persistence": 3
+        }
+    },
+    "M-7": {
+        "linear_regression": {
+            "threshold": 0.005696657256845206,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 6.341518866614937e-05,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.014064834936474258,
+            "persistence": 3
+        }
+    },
+    "F-8": {
+        "linear_regression": {
+            "threshold": 1.0349797516980075,
+            "persistence": 3
+        },
+        "random_forest": {
+            "threshold": 1.0266700051447075,
+            "persistence": 3
+        },
+        "lstm": {
+            "threshold": 0.44604198477938983,
+            "persistence": 5
+        }
+    }
+}

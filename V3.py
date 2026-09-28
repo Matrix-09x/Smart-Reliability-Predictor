@@ -5,6 +5,11 @@ import math as m
 import ast
 import tensorflow   as tf
 
+import os 
+import json
+
+import joblib
+
 
 import matplotlib.pyplot as plt
 
@@ -22,8 +27,24 @@ anomalies = pd.read_csv('labeled_anomalies.csv').reset_index(drop=True)
 anomalies = anomalies.set_index('chan_id')
 
 
+def get_anomaly_zone(channel) :
+    rows = anomalies.loc[channel, 'anomaly_sequences']
+
+    if isinstance(rows,pd.Series) :
+        zones = []
+
+        for value in rows :
+            zones.extend(ast.literal_eval(value))
+
+
+        return zones
+
+    return ast.literal_eval(rows)
+
+
+
 np.set_printoptions(threshold=np.inf)
-def Lstm_channel(channel) :
+def Lstm_channel(channel,mode = "inference") :
 
     Training = np.load(f'data\data/train/{channel}.npy')
     Training_signal = Training[:,0]
@@ -95,425 +116,437 @@ def Lstm_channel(channel) :
     y_validation = np.array(y_validation)
 
 
-    anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
-
-    list_data = ast.literal_eval(anomaly_zone)
-    anomaly_array  = np.array(list_data,dtype= int)
+    anomaly_zone = get_anomaly_zone(channel)
+    anomaly_array = np.array(anomaly_zone,dtype= int)
 
 
     # Total_anoamly = anomaly_array[0,1] - anomaly_array[0,0]  +  1
 
 
+    if mode  == "inference" :
 
-    lstm_model = Sequential([tf.keras.Input(shape = (window_size,1)) ,LSTM(50),Dense(1)])
-    lstm_model.compile(optimizer= 'adam' , loss = 'mse')
+        lstm_model = tf.keras.models.load_model(f'models/lstm/{channel}.keras')
 
-    lstm_model.fit(input_lstm , y_train , epochs= 10 , batch_size= 32)
+        with open('models/calibration.json','r') as file :
+            calibration = json.load(file)[channel]['lstm']
 
-    validation_predictions = lstm_model.predict(x_validation_lstm,verbose= 0)
+        selected_threshold = calibration['threshold']
+        selected_persistance = calibration['persistence']
 
-    validation_predictions = validation_predictions.flatten()
 
-    validation_error = np.abs(y_validation - validation_predictions)
-
-    mean = np.mean(validation_error)
-    std = np.std(validation_error)
-
-    threshold_list = [1,1.5,2,2.5,3,3.5]
-
-    values_list = []
-    
-    for i in threshold_list :
-        threshold =  mean + i * std
-        values_list.append(threshold)
-
-
-
-    Predictions_diff_thresholds = []
-    
-    for i in values_list :
-        anomalies_indices = np.where(validation_error > i)[0]
-        Predictions_diff_thresholds.append(anomalies_indices)
-
-
-    flaggged_points_count = []
-    for i in Predictions_diff_thresholds :
-        count = len(i)
-        flaggged_points_count.append(count)
-
-
-    # flaggged_points_count = np.array(flaggged_points_count)
-
-    # Flagges_rate = flaggged_points_count/len(validation_error)
-
-
-    # print(values_list)
-    # print(Flagges_rate)s
-    
-    # print(f'mean | {validation_mean}')
-    # print(f'Std | {validation_std}')
-    # print(f'Total length | {len(copy_validation_Signal)}')
-    
-
-    scenario_list =[
-        ('spike',150,155),
-        ('spike',304,309),
-        ('spike',405,410),
-        ('level',200,220),
-        ('level',90,115)
-                    ]
-        
-
-  
-    persistance = [1,2,3,5]
-    all_scenario_metrics = []
-
-    for scenario_type,first , second in scenario_list :
-
-        copy_validation_Signal = np.array(validation_signal)    
-        validation_std = np.std(copy_validation_Signal)
-        validation_mean = np.mean(copy_validation_Signal) 
-
-        total = second - first 
-
-        if scenario_type == 'spike' :
-            copy_validation_Signal[first:second] += 4 * validation_std
-
-        elif scenario_type == 'level' :
-            copy_validation_Signal[first:second] += 2 * validation_std
-        
-      
-        
-        # print(len(copy_validation_Signal))
-
-        # print(f'Copy validation_signal | {copy_validation_Signal[290:320]}')
-
-        x_injected = []
-        y_injected = []
-
-        for i,value in enumerate(copy_validation_Signal) :
-            if i < len(copy_validation_Signal) - window_size :
-                x_injected.append(copy_validation_Signal[i:i+window_size])
-                y_injected.append(copy_validation_Signal[i+window_size])
-
-        x_injected = np.array(x_injected)
-        y_injected = np.array(y_injected)
-
-        x_injected_lstm = x_injected.reshape(x_injected.shape[0],x_injected.shape[1],1)
-        injected_predictions = lstm_model.predict(x_injected_lstm,verbose=0)
-
-        injected_predictions = injected_predictions.flatten()
-
-        injection_error = np.abs(y_injected - injected_predictions)
-
-        injected_threshold_results = []
-
-        for i in values_list :
-            indices = np.where(injection_error > i)[0]
-
-            original_indices = indices + window_size
-            injected_threshold_results.append(original_indices)
-
-        persistance = [1,2,3,5]
-
-        final_experiment_continous_anomalies = []
-        for n in persistance :
-
-            threshold_continuous_anomalies = []
-            for threshold in values_list :
-                validation_continuous_anomalies = []
-                validation_error_count = 0 
-                streak_start = None 
-                for index , err in  enumerate(injection_error) :
-                    if err  >  threshold :
-                        if validation_error_count == 0 :
-                            streak_start = index 
-                        validation_error_count += 1
-
-                    else :
-                        if validation_error_count >= n :
-                            validation_continuous_anomalies.extend(range(streak_start,index))
-                        streak_start = None 
-                        validation_error_count = 0
-
-                if validation_error_count >= n :
-                    validation_continuous_anomalies.extend(range(streak_start , index+1))
-
-                threshold_continuous_anomalies.append(validation_continuous_anomalies)
-
-            
-            final_experiment_continous_anomalies.append(threshold_continuous_anomalies)
-
-        
-        # print(f'Persistance and threshold combianation | {final_experiment_continous_anomalies}') 
-        
-
-        
-        
-
-        combination_list_1  = []
-        combination_list_2 = []
-        combination_list_3 = []
-        combination_list_4 = []
-        comnination_list_5 = []
-        combination_list_6= []
-        for index,experiment in enumerate(final_experiment_continous_anomalies) :
-            persistance_value = persistance[index]
-        
-            tp_list = []
-            fp_list = []
-            fn_list = []
-            precision_list = []
-            recall_list = []
-            dedected_list_thresholds = []
-            delay = []
-            for theshold in experiment :
-                tp = 0
-                fp = 0
-                dedected_list_points = []
-                for  i in theshold:
-            
-                    if i >= first - window_size and i < second - window_size :
-                        tp+=1  
-                        dedected_list_points.append(i) 
-
-                    else :
-                        fp +=1 
-
-                fn = total - tp 
-
-
-                if tp  > total :
-                    print('Warning: Tp exceeds total')
-                    print(f'Scenario {scenario_type},({first},{second})')
-                    print(f'Tp: {tp} , Total : {total}')
-
-                precision = tp/(tp+fp) if (tp+fp > 0) else  0 
-                recall = tp/(tp+fn) if (tp+fn > 0) else 0
-
-                tp_list.append(tp)
-                fp_list.append(fp)
-                fn_list.append(fn)
-                precision_list.append(precision)
-                recall_list.append(recall)
-
-                alert_point = None 
-                previous_point = None
-                streak_count = 0
-
-                anomaly_start = first - window_size
-                anomaly_end = second - window_size
-
-                for point in sorted(theshold):
-                    if previous_point is not None and point == previous_point + 1 :
-                        streak_count += 1
-                    else :
-                        streak_count = 1
-
-                    if streak_count >= persistance_value :
-                        if anomaly_start <= point and point < anomaly_end :
-                            alert_point = point 
-                            break 
-
-                    previous_point = point
-
-                if alert_point is not None :
-                    delay_value = alert_point - anomaly_start
-                    dedected_list_thresholds.append(dedected_list_points[0])
-                    delay.append(delay_value)
-
-                else : 
-                    dedected_list_thresholds.append('misses') 
-                    delay.append('Not found')
-
-               
-
-
-            # print(f'Tp | {tp_list}')
-            # print(f'Fp | {fp_list}')
-            # print(f'Fn | {fn_list}')
-            # print(f'Precison | {precision_list}')
-            # print(f'Recall | {recall_list}')
-            # print(f'Dedected points | {dedected_list_thresholds}')
-            # print(f'Delay | {delay}')
-            
-          
-            combination_list_1.append([tp_list[0],fp_list[0],fn_list[0],precision_list[0],recall_list[0],dedected_list_thresholds[0],delay[0]])
-            combination_list_2.append([tp_list[1],fp_list[1],fn_list[1],precision_list[1],recall_list[1],dedected_list_thresholds[1],delay[1]])
-            combination_list_3.append([tp_list[2],fp_list[2],fn_list[2],precision_list[2],recall_list[2],dedected_list_thresholds[2],delay[2]])
-            combination_list_4.append([tp_list[3],fp_list[3],fn_list[3],precision_list[3],recall_list[3],dedected_list_thresholds[3],delay[3]])
-            comnination_list_5.append([tp_list[4],fp_list[4],fn_list[4],precision_list[4],recall_list[4],dedected_list_thresholds[4],delay[4]])
-            combination_list_6.append([tp_list[5],fp_list[5],fn_list[5],precision_list[5],recall_list[5],dedected_list_thresholds[5],delay[5]])
-
-        Total_combination_list = [combination_list_1,combination_list_2,combination_list_3,combination_list_4,comnination_list_5,combination_list_6]
-
-        # print(combination_list_1)
-        # print(combination_list_2)
-        # print(combination_list_3)
-        # print(combination_list_4)
-        # print(comnination_list_5)
-        # print(combination_list_6)
-        # print()
-        
-        metrics_list = []
-        
-        for index ,  threshold_list in enumerate(Total_combination_list):
-            threshold_index = index
-
-            for index,i in enumerate(threshold_list) :
-                tp , fp , fn , precision , recall , detected_thresholds , delay = i 
-                persistance__value = persistance[index]
-
-                if delay != 'Not found' :
-                    delay = delay 
-                else :
-                    delay = float('inf')
-
-
-                metrics_list.append({
-                    'threshold' : threshold_index,
-                    'persistance' : persistance__value,
-                    'Tp' : tp ,
-                    'Fp' : fp ,
-                    'fn' : fn,
-                    'precison' : precision,
-                    'recall' : recall,
-                    'Dedected Threshold' : detected_thresholds,
-                    'Delay' : delay
-                })
-
-        
-        all_scenario_metrics.append({
-            'scenario' : [first,second],
-            'metrics' :metrics_list.copy()
-        })
-
-
-    # print(all_scenario_metrics)
-        
-    combined_metrics = []
-
-    for  candidate in all_scenario_metrics[0]['metrics'] :
-        combined_metrics.append({
-            'threshold' : candidate['threshold'],
-            'persistance' : candidate['persistance'],
-            'combined tp' : 0,
-            'combined fp' : 0,
-            'combined fn' : 0,
-        })
-
-
-    for scenario in all_scenario_metrics :
-        metrics = scenario['metrics']
-        
-        for index,candidate in enumerate(metrics):
-            combined_metrics[index]['combined tp'] +=  candidate['Tp']
-            combined_metrics[index]['combined fp'] += candidate['Fp']
-            combined_metrics[index]['combined fn'] += candidate['fn']
-    
-
-    for candidate in combined_metrics :
-        tp = candidate['combined tp']
-        fp = candidate['combined fp']
-        fn = candidate['combined fn']
-
-        precision = tp/(tp+fp) if (tp+fp) != 0 else 0 
-        recall = tp/(tp+fn)  if (tp+fn) != 0 else 0 
-
-        f1_score = 2 * (precision * recall)/(precision + recall) if precision + recall != 0 else 0
-
-        candidate['combined precision'] = precision 
-        candidate['combined recall'] = recall
-        candidate['combined F1'] = f1_score
-
-
-    for index , candidate in enumerate(combined_metrics) :
-        scenario_precision = []
-        scenario_recall = []
-        scenario_f1 = []
-
-        for scenrio in all_scenario_metrics :
-            sceanrio_candidate = scenrio['metrics'][index]
-
-            pre = sceanrio_candidate['precison']
-            reca = sceanrio_candidate['recall']
-            f1 = 2 * (pre * reca)/(pre + reca) if pre + reca != 0 else 0 
-            scenario_precision.append(pre)  
-            scenario_recall.append(reca)
-            scenario_f1.append(f1)
-
-        candidate['Average precision scenario'] = sum(scenario_precision)/len(scenario_precision)
-        candidate['Average recall scenario'] = sum(scenario_recall)/len(scenario_recall)
-        candidate['Average F1 score scenario'] = sum(scenario_f1)/len(scenario_f1)
-
-    for candidate in combined_metrics :
-        threshold = values_list[candidate['threshold']]
-        persistance_value = candidate['persistance']
-
-        normal_error_count = 0
-        normal_streak_count = None
-        normal_anomalies = []
-
-        for index,err in enumerate(validation_error) :
-            if err > threshold :
-                if normal_error_count == 0 :
-                    normal_streak_count = index 
-                normal_error_count += 1
-
-            else :
-                if normal_error_count >= persistance_value :
-                    normal_anomalies.extend(range(normal_streak_count,index))
-
-                normal_error_count = 0
-                normal_streak_count = None
-
-        if normal_error_count >= persistance_value :
-            normal_anomalies.extend(range(normal_streak_count,index+1))
-
-
-        candidate['normal false alarm rate'] = (len(normal_anomalies)/len(validation_error))
-
- 
-
-    # for candidate in combined_metrics :
-    #     print(
-    #         f"Threshold | {values_list[candidate['threshold']]:.4f}"
-    #         f"Persistance | {candidate['persistance']}"
-    #         f"TP | {candidate['combined tp']}"
-    #         f"FP | {candidate['combined fp']}"
-    #         f"FN | {candidate['combined fn']}"
-    #         f"Precision | {candidate['combined precision']:.4f}"
-    #         f"Recall | {candidate['combined recall']:.4f}"
-    #         f"F1| {candidate['combined F1']}"
-    #         f"Average precision scenario | {candidate['Average precision scenario']:.4f}"
-    #         f"Average recall scenario | {candidate['Average recall scenario']:.4f}"
-    #         f"Average F1 scenario | {candidate['Average F1 score scenario']:.4f}"
-    #         f"Normal false alarm rate | {candidate['normal false alarm rate']:.4%}"
-
-    #     )
-
-  
-  
-    acceptable_candidate = []
-    for  candidate in combined_metrics :
-        if candidate['normal false alarm rate'] <= 0.005 and candidate['persistance'] >= 3   :
-             acceptable_candidate.append(candidate) 
-
-    if acceptable_candidate :
-            best_candidate = max(acceptable_candidate,key=lambda candidate : (candidate['combined F1']))
 
     else :
-        best_candidate = min(combined_metrics,key = lambda candidate : (candidate['normal false alarm rate'],-candidate['combined F1']))
+        lstm_model = Sequential([tf.keras.Input(shape = (window_size,1)) ,LSTM(50),Dense(1)])
+        lstm_model.compile(optimizer= 'adam' , loss = 'mse')
 
+        lstm_model.fit(input_lstm , y_train , epochs= 10 , batch_size= 32)
+
+        validation_predictions = lstm_model.predict(x_validation_lstm,verbose= 0)
+
+        validation_predictions = validation_predictions.flatten()
+
+        validation_error = np.abs(y_validation - validation_predictions)
+
+        mean = np.mean(validation_error)
+        std = np.std(validation_error)
+
+        threshold_list = [1,1.5,2,2.5,3,3.5]
+
+        values_list = []
+        
+        for i in threshold_list :
+            threshold =  mean + i * std
+            values_list.append(threshold)
+
+
+
+        Predictions_diff_thresholds = []
+        
+        for i in values_list :
+            anomalies_indices = np.where(validation_error > i)[0]
+            Predictions_diff_thresholds.append(anomalies_indices)
+
+
+        flaggged_points_count = []
+        for i in Predictions_diff_thresholds :
+            count = len(i)
+            flaggged_points_count.append(count)
+
+
+       
+
+        scenario_list =[
+            ('spike',150,155),
+            ('spike',304,309),
+            ('spike',405,410),
+            ('level',200,220),
+            ('level',90,115)
+                        ]
+            
+
+    
+        persistance = [1,2,3,5]
+        all_scenario_metrics = []
+
+        for scenario_type,first , second in scenario_list :
+
+            copy_validation_Signal = np.array(validation_signal)    
+            validation_std = np.std(copy_validation_Signal)
+            validation_mean = np.mean(copy_validation_Signal) 
+
+            total = second - first 
+
+            if scenario_type == 'spike' :
+                copy_validation_Signal[first:second] += 4 * validation_std
+
+            elif scenario_type == 'level' :
+                copy_validation_Signal[first:second] += 2 * validation_std
+            
+        
+            
+            # print(len(copy_validation_Signal))
+
+            # print(f'Copy validation_signal | {copy_validation_Signal[290:320]}')
+
+            x_injected = []
+            y_injected = []
+
+            for i,value in enumerate(copy_validation_Signal) :
+                if i < len(copy_validation_Signal) - window_size :
+                    x_injected.append(copy_validation_Signal[i:i+window_size])
+                    y_injected.append(copy_validation_Signal[i+window_size])
+
+            x_injected = np.array(x_injected)
+            y_injected = np.array(y_injected)
+
+            x_injected_lstm = x_injected.reshape(x_injected.shape[0],x_injected.shape[1],1)
+            injected_predictions = lstm_model.predict(x_injected_lstm,verbose=0)
+
+            injected_predictions = injected_predictions.flatten()
+
+            injection_error = np.abs(y_injected - injected_predictions)
+
+            injected_threshold_results = []
+
+            for i in values_list :
+                indices = np.where(injection_error > i)[0]
+
+                original_indices = indices + window_size
+                injected_threshold_results.append(original_indices)
+
+            persistance = [1,2,3,5]
+
+            final_experiment_continous_anomalies = []
+            for n in persistance :
+
+                threshold_continuous_anomalies = []
+                for threshold in values_list :
+                    validation_continuous_anomalies = []
+                    validation_error_count = 0 
+                    streak_start = None 
+                    for index , err in  enumerate(injection_error) :
+                        if err  >  threshold :
+                            if validation_error_count == 0 :
+                                streak_start = index 
+                            validation_error_count += 1
+
+                        else :
+                            if validation_error_count >= n :
+                                validation_continuous_anomalies.extend(range(streak_start,index))
+                            streak_start = None 
+                            validation_error_count = 0
+
+                    if validation_error_count >= n :
+                        validation_continuous_anomalies.extend(range(streak_start , index+1))
+
+                    threshold_continuous_anomalies.append(validation_continuous_anomalies)
+
+                
+                final_experiment_continous_anomalies.append(threshold_continuous_anomalies)
+
+            
+            # print(f'Persistance and threshold combianation | {final_experiment_continous_anomalies}') 
+            
+
+            
+            
+
+            combination_list_1  = []
+            combination_list_2 = []
+            combination_list_3 = []
+            combination_list_4 = []
+            comnination_list_5 = []
+            combination_list_6= []
+            for index,experiment in enumerate(final_experiment_continous_anomalies) :
+                persistance_value = persistance[index]
+            
+                tp_list = []
+                fp_list = []
+                fn_list = []
+                precision_list = []
+                recall_list = []
+                dedected_list_thresholds = []
+                delay = []
+                for theshold in experiment :
+                    tp = 0
+                    fp = 0
+                    dedected_list_points = []
+                    for  i in theshold:
+                
+                        if i >= first - window_size and i < second - window_size :
+                            tp+=1  
+                            dedected_list_points.append(i) 
+
+                        else :
+                            fp +=1 
+
+                    fn = total - tp 
+
+
+                    if tp  > total :
+                        print('Warning: Tp exceeds total')
+                        print(f'Scenario {scenario_type},({first},{second})')
+                        print(f'Tp: {tp} , Total : {total}')
+
+                    precision = tp/(tp+fp) if (tp+fp > 0) else  0 
+                    recall = tp/(tp+fn) if (tp+fn > 0) else 0
+
+                    tp_list.append(tp)
+                    fp_list.append(fp)
+                    fn_list.append(fn)
+                    precision_list.append(precision)
+                    recall_list.append(recall)
+
+                    alert_point = None 
+                    previous_point = None
+                    streak_count = 0
+
+                    anomaly_start = first - window_size
+                    anomaly_end = second - window_size
+
+                    for point in sorted(theshold):
+                        if previous_point is not None and point == previous_point + 1 :
+                            streak_count += 1
+                        else :
+                            streak_count = 1
+
+                        if streak_count >= persistance_value :
+                            if anomaly_start <= point and point < anomaly_end :
+                                alert_point = point 
+                                break 
+
+                        previous_point = point
+
+                    if alert_point is not None :
+                        delay_value = alert_point - anomaly_start
+                        dedected_list_thresholds.append(dedected_list_points[0])
+                        delay.append(delay_value)
+
+                    else : 
+                        dedected_list_thresholds.append('misses') 
+                        delay.append('Not found')
+
+                
+
+
+                # print(f'Tp | {tp_list}')
+                # print(f'Fp | {fp_list}')
+                # print(f'Fn | {fn_list}')
+                # print(f'Precison | {precision_list}')
+                # print(f'Recall | {recall_list}')
+                # print(f'Dedected points | {dedected_list_thresholds}')
+                # print(f'Delay | {delay}')
+                
+            
+                combination_list_1.append([tp_list[0],fp_list[0],fn_list[0],precision_list[0],recall_list[0],dedected_list_thresholds[0],delay[0]])
+                combination_list_2.append([tp_list[1],fp_list[1],fn_list[1],precision_list[1],recall_list[1],dedected_list_thresholds[1],delay[1]])
+                combination_list_3.append([tp_list[2],fp_list[2],fn_list[2],precision_list[2],recall_list[2],dedected_list_thresholds[2],delay[2]])
+                combination_list_4.append([tp_list[3],fp_list[3],fn_list[3],precision_list[3],recall_list[3],dedected_list_thresholds[3],delay[3]])
+                comnination_list_5.append([tp_list[4],fp_list[4],fn_list[4],precision_list[4],recall_list[4],dedected_list_thresholds[4],delay[4]])
+                combination_list_6.append([tp_list[5],fp_list[5],fn_list[5],precision_list[5],recall_list[5],dedected_list_thresholds[5],delay[5]])
+
+            Total_combination_list = [combination_list_1,combination_list_2,combination_list_3,combination_list_4,comnination_list_5,combination_list_6]
+
+            # print(combination_list_1)
+            # print(combination_list_2)
+            # print(combination_list_3)
+            # print(combination_list_4)
+            # print(comnination_list_5)
+            # print(combination_list_6)
+            # print()
+            
+            metrics_list = []
+            
+            for index ,  threshold_list in enumerate(Total_combination_list):
+                threshold_index = index
+
+                for index,i in enumerate(threshold_list) :
+                    tp , fp , fn , precision , recall , detected_thresholds , delay = i 
+                    persistance__value = persistance[index]
+
+                    if delay != 'Not found' :
+                        delay = delay 
+                    else :
+                        delay = float('inf')
+
+
+                    metrics_list.append({
+                        'threshold' : threshold_index,
+                        'persistance' : persistance__value,
+                        'Tp' : tp ,
+                        'Fp' : fp ,
+                        'fn' : fn,
+                        'precison' : precision,
+                        'recall' : recall,
+                        'Dedected Threshold' : detected_thresholds,
+                        'Delay' : delay
+                    })
+
+            
+            all_scenario_metrics.append({
+                'scenario' : [first,second],
+                'metrics' :metrics_list.copy()
+            })
+
+
+        # print(all_scenario_metrics)
+            
+        combined_metrics = []
+
+        for  candidate in all_scenario_metrics[0]['metrics'] :
+            combined_metrics.append({
+                'threshold' : candidate['threshold'],
+                'persistance' : candidate['persistance'],
+                'combined tp' : 0,
+                'combined fp' : 0,
+                'combined fn' : 0,
+            })
+
+
+        for scenario in all_scenario_metrics :
+            metrics = scenario['metrics']
+            
+            for index,candidate in enumerate(metrics):
+                combined_metrics[index]['combined tp'] +=  candidate['Tp']
+                combined_metrics[index]['combined fp'] += candidate['Fp']
+                combined_metrics[index]['combined fn'] += candidate['fn']
+        
+
+        for candidate in combined_metrics :
+            tp = candidate['combined tp']
+            fp = candidate['combined fp']
+            fn = candidate['combined fn']
+
+            precision = tp/(tp+fp) if (tp+fp) != 0 else 0 
+            recall = tp/(tp+fn)  if (tp+fn) != 0 else 0 
+
+            f1_score = 2 * (precision * recall)/(precision + recall) if precision + recall != 0 else 0
+
+            candidate['combined precision'] = precision 
+            candidate['combined recall'] = recall
+            candidate['combined F1'] = f1_score
+
+
+        for index , candidate in enumerate(combined_metrics) :
+            scenario_precision = []
+            scenario_recall = []
+            scenario_f1 = []
+
+            for scenrio in all_scenario_metrics :
+                sceanrio_candidate = scenrio['metrics'][index]
+
+                pre = sceanrio_candidate['precison']
+                reca = sceanrio_candidate['recall']
+                f1 = 2 * (pre * reca)/(pre + reca) if pre + reca != 0 else 0 
+                scenario_precision.append(pre)  
+                scenario_recall.append(reca)
+                scenario_f1.append(f1)
+
+            candidate['Average precision scenario'] = sum(scenario_precision)/len(scenario_precision)
+            candidate['Average recall scenario'] = sum(scenario_recall)/len(scenario_recall)
+            candidate['Average F1 score scenario'] = sum(scenario_f1)/len(scenario_f1)
+
+        for candidate in combined_metrics :
+            threshold = values_list[candidate['threshold']]
+            persistance_value = candidate['persistance']
+
+            normal_error_count = 0
+            normal_streak_count = None
+            normal_anomalies = []
+
+            for index,err in enumerate(validation_error) :
+                if err > threshold :
+                    if normal_error_count == 0 :
+                        normal_streak_count = index 
+                    normal_error_count += 1
+
+                else :
+                    if normal_error_count >= persistance_value :
+                        normal_anomalies.extend(range(normal_streak_count,index))
+
+                    normal_error_count = 0
+                    normal_streak_count = None
+
+            if normal_error_count >= persistance_value :
+                normal_anomalies.extend(range(normal_streak_count,index+1))
+
+
+            candidate['normal false alarm rate'] = (len(normal_anomalies)/len(validation_error))
 
     
 
+        # for candidate in combined_metrics :
+        #     print(
+        #         f"Threshold | {values_list[candidate['threshold']]:.4f}"
+        #         f"Persistance | {candidate['persistance']}"
+        #         f"TP | {candidate['combined tp']}"
+        #         f"FP | {candidate['combined fp']}"
+        #         f"FN | {candidate['combined fn']}"
+        #         f"Precision | {candidate['combined precision']:.4f}"
+        #         f"Recall | {candidate['combined recall']:.4f}"
+        #         f"F1| {candidate['combined F1']}"
+        #         f"Average precision scenario | {candidate['Average precision scenario']:.4f}"
+        #         f"Average recall scenario | {candidate['Average recall scenario']:.4f}"
+        #         f"Average F1 scenario | {candidate['Average F1 score scenario']:.4f}"
+        #         f"Normal false alarm rate | {candidate['normal false alarm rate']:.4%}"
+
+        #     )
+
+    
+    
+        acceptable_candidate = []
+        for  candidate in combined_metrics :
+            if candidate['normal false alarm rate'] <= 0.005 and candidate['persistance'] >= 3   :
+                acceptable_candidate.append(candidate) 
+
+        if acceptable_candidate :
+                best_candidate = max(acceptable_candidate,key=lambda candidate : (candidate['combined F1']))
+
+        else :
+            best_candidate = min(combined_metrics,key = lambda candidate : (candidate['normal false alarm rate'],-candidate['combined F1']))
 
 
-            
+        
 
-    selected_threshold = values_list[best_candidate['threshold']]
-    selected_persistance = best_candidate['persistance']
+
+
+                
+
+        selected_threshold = values_list[best_candidate['threshold']]
+        selected_persistance = best_candidate['persistance']
+
+
+    if mode == 'pretrain' :
+        os.makedirs('models/lstm',exist_ok=True)
+
+
+        lstm_model.save(f'models/lstm/{channel}.keras')
+
+        return {
+            'threshold' : float(selected_threshold),
+            'persistence' : int(selected_persistance)
+
+        }
 
     # print(best_candidate)
     # print(f'Selected threshold | {selected_threshold}')
@@ -527,8 +560,7 @@ def Lstm_channel(channel) :
     # print(f'Validation error -mean : {mean:.4f}, std: {std:.4f}')
     # print(f'Test error -mean : {np.mean(test_err):.4f} , std : {np.std(test_err):.4f}')
    
-    row =anomalies.loc[channel]
-    anomaly_zone = ast.literal_eval(row['anomaly_sequences'])
+   
    
  
 
@@ -636,9 +668,9 @@ def Lstm_channel(channel) :
 
 
 
-def Random_forest(channel) :
+def Random_forest(channel,mode = "inference") :
     Training  = np.load(f'data/data/train/{channel}.npy')
-    testing = np.load(f'data/data/train/{channel}.npy')
+    testing = np.load(f'data/data/test/{channel}.npy')
 
     
     Training_signal = Training[:,0]
@@ -687,26 +719,45 @@ def Random_forest(channel) :
     x_test = np.array(x_test)
     y_test = np.array(y_test)
 
-    anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
+    anomaly_zone = get_anomaly_zone(channel)
+    anomaly_array =  np.array(anomaly_zone,dtype=int)
 
-    list_data = ast.literal_eval(anomaly_zone)
-    anomaly_array = np.array(list_data,dtype=int)
+    if mode == 'inference' :
+        model = joblib.load(f'models/rf/{channel}.joblib')
+
+        with open('models/calibration.json','r') as file  : 
+            calibration = json.load(file)[channel]['random_forest']
 
 
-    model = RandomForestRegressor(n_estimators=50,random_state=42,n_jobs=-1)
-    model.fit(x_train,y_train)
+        threshold = calibration["threshold"]
+    else :
+        
 
-    validation_predictions = model.predict(x_validation)
+        model = RandomForestRegressor(n_estimators=50,random_state=42,n_jobs=-1)
+        model.fit(x_train,y_train)
 
-    validation_predictions = validation_predictions.flatten()
+        validation_predictions = model.predict(x_validation)
 
-    validation_error = np.abs(y_validation - validation_predictions)
+        validation_predictions = validation_predictions.flatten()
 
-    mean = np.mean(validation_error)
-    std = np.std(validation_error)
+        validation_error = np.abs(y_validation - validation_predictions)
 
-    threshold = mean + 3*std 
-    
+        mean = np.mean(validation_error)
+        std = np.std(validation_error)
+
+        threshold = mean + 3*std 
+
+    if  mode == 'pretrain' :
+        os.makedirs("models/rf",exist_ok= True)
+
+        joblib.dump(model,f"models/rf/{channel}.joblib")
+
+        return {
+            'threshold' :float(threshold),
+            'persistence' : 3
+            }
+
+
 
     test_predictions = model.predict(x_test)
     test_predictions = test_predictions.flatten()
@@ -743,11 +794,10 @@ def Random_forest(channel) :
     ax.plot(test_error)
     ax.axhline(y=threshold, linewidth = 2 , color = 'green' )
 
-    row = anomalies.loc[channel]
-    anomaly_zone = eval(row['anomaly_sequences'])
+ 
 
     for starr , end in anomaly_zone :
-        ax.axvspan(starr , end , alpha = 0.3 , color = 'red')
+        ax.axvspan(starr - window_size , end - window_size , alpha = 0.3 , color = 'red')
 
     ax.set_xlabel('Test_index')
     ax.set_ylabel('Test error')
@@ -787,7 +837,7 @@ def Random_forest(channel) :
 
 
 
-def Linear_Regression(channel) :
+def Linear_Regression(channel,mode="inference") :
     training = np.load(f'data/data/train/{channel}.npy')
     testing = np.load(f'data/data/test/{channel}.npy')
 
@@ -834,25 +884,43 @@ def Linear_Regression(channel) :
     x_test = np.array(x_test)
     y_test = np.array(y_test) 
 
-    anomaly_zone = anomalies.loc[channel,'anomaly_sequences']
+    anomaly_zone = get_anomaly_zone(channel)
+    anomaly_array = np.array(anomaly_zone,dtype=int)
 
-    list_data = ast.literal_eval(anomaly_zone)
-    anomaly_array = np.array(list_data,dtype=int)
+    if mode == "inference" :
+        model = joblib.load(f"models/lr/{channel}.joblib")
 
+        with open("models/calibration.json","r") as file :
+            calibration = json.load(file)[channel]["linear_regression"]
 
-    model = LinearRegression()
-    model.fit(x_train,y_train)
+        threshold = calibration["threshold"]
 
-    validation_predictions = model.predict(x_validation)
-    validation_predictions = validation_predictions.flatten()
+    else :
+        
+        model = LinearRegression()
+        model.fit(x_train,y_train)
 
-    validation_err = np.abs(y_validation - validation_predictions)
+        validation_predictions = model.predict(x_validation)
+        validation_predictions = validation_predictions.flatten()
 
-    mean = np.mean(validation_err)
-    std = np.std(validation_err)
+        validation_err = np.abs(y_validation - validation_predictions)
 
-    threshold = mean + 3*std 
-    
+        mean = np.mean(validation_err)
+        std = np.std(validation_err)
+
+        threshold = mean + 3*std 
+
+    if mode == 'pretrain' :
+
+        os.makedirs("models/lr",exist_ok=True)
+
+        joblib.dump(model,f"models/lr/{channel}.joblib")
+
+        return{
+            "threshold": float(threshold),
+            "persistence" : 3
+        }
+
     test_predictions = model.predict(x_test)
     test_predictions = test_predictions.flatten()
 
@@ -890,11 +958,10 @@ def Linear_Regression(channel) :
     ax.plot(test_error)
     ax.axhline(y=threshold , linewidth = 2 , color = 'green')
 
-    row = anomalies.loc[channel]
-    anomaly_zone = eval(row['anomaly_sequences'])
+ 
 
     for start , end in anomaly_zone :
-        ax.axvspan(start,end,alpha = 0.3 , color = 'red')
+        ax.axvspan(start - window_size ,end - window_size,alpha = 0.3 , color = 'red')
 
     ax.set_xlabel('Test index')
     ax.set_ylabel('Test error')

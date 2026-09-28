@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import time 
 
 from V3 import Lstm_channel , anomalies , Linear_Regression ,Random_forest
 
@@ -11,7 +12,7 @@ from V1_V2 import  Proability_stimulator
 
 models = ['Linear Regression','Random Forest','Long Term Short Memory(LSTM)']
 channels = anomalies.index.to_list()
-# print(channels)
+
 
 st.set_page_config(
     page_title= 'NASA Spacecraft Reliability Engine',
@@ -539,17 +540,20 @@ else :
         if model_selected == 'Long Term Short Memory(LSTM)' :
 
             with st.spinner('Training LSTM model and analyzing Telemetry.... this may take a while') :
+                time.sleep(2.5)
                 result = Lstm_channel(selected_channel)
 
 
         elif model_selected == 'Random Forest' :
 
             with st.spinner('Training Random Forest and analyzing Telemetry... this may take a while') :
+                 time.sleep(2.5)
                  result = Random_forest(selected_channel)
 
         elif model_selected == 'Linear Regression' :
 
             with st.spinner('Training Lineare Regression and analyzing Telemetry... this may take a while') :
+                time.sleep(2.5)
                 result = Linear_Regression(selected_channel)
 
 
