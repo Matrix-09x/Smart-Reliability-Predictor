@@ -46,7 +46,7 @@ def get_anomaly_zone(channel) :
 np.set_printoptions(threshold=np.inf)
 def Lstm_channel(channel,mode = "inference") :
 
-    Training = np.load(f'data\data/train/{channel}.npy')
+    Training = np.load(f'data/data/train/{channel}.npy')
     Training_signal = Training[:,0]
 
 
@@ -78,7 +78,7 @@ def Lstm_channel(channel,mode = "inference") :
 
     y_train = np.array(y_train)
 
-    Testing  =  np.load(f'data\data/test/{channel}.npy')
+    Testing  =  np.load(f'data/data/test/{channel}.npy')
     testing_signal =  Testing[:,0]
 
 
