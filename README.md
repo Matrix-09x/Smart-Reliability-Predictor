@@ -300,7 +300,7 @@ The NASA dataset is also challenging: different channels have different behavior
 
 I used AI as a learning, planning, and documentation assistant throughout the project. I also used AI to help me understand concepts and approaches when I was stuck.
 
-A small CSS section in `app.py` was initially generated with AI because I was unfamiliar with CSS. I studied how it worked, then modified and customized it myself for the final dashboard.
+For coding the index.html file (frontend) is made by ai . Because previously i made it using streamlit but it was not allowed to deploy in in so i switch to vercel than like i need to make the dashboard with html but i didnt know it and dont have enough time .
 
 ---
 
