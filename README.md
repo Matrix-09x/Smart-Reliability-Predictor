@@ -1,24 +1,22 @@
-# Smart Reliability & Failure Predictor
+# **Smart Reliability & Failure Predictor**
 
 A reliability and anomaly-detection system that evolved from probability-based failure analysis into a machine-learning system for real NASA spacecraft telemetry.
 
 The project combines probability, statistics, Bayesian inference, and machine learning to detect unusual behavior, investigate possible causes, and identify anomalies in real telemetry data.
 
-
-
 ---
 
-##  Live Demo
+## **Live Demo**
 
 **Try the deployed application:**
-[Smart Reliability & Failure Predictor](https://smart-reliability-predictor-xf8m7suhusz4mu9tp8lert.streamlit.app/)
+
+[Smart Reliability & Failure Predictor](https://smart-reliability-predictor.vercel.app/)
 
 The deployed dashboard contains the V1/V2 reliability simulator and the V3 NASA telemetry anomaly-detection system.
 
-
 ---
 
-## My Story
+## **My Story**
 
 I had been studying probability and statistics for AI engineering, but I was mostly just consuming theory. I wanted to actually build something—my inner engineer was coming out (especially after watching *Spider-Man: Brand New Day*!).
 
@@ -26,28 +24,34 @@ That led me to **StarDance**, where I decided to build a reliability system that
 
 ---
 
-# Project Evolution
+# **Project Evolution**
 
-## V1 — Probability-Based Reliability Analysis
+## **V1 — Probability-Based Reliability Analysis**
 
 The first version simulated a system receiving requests with a certain probability of failure.
 
 I used the **Binomial distribution** to model failures:
 
 $$
+
 X \sim \text{Binomial}(n,p)
+
 $$
 
 with expected failures:
 
 $$
+
 E[X] = np
+
 $$
 
 I initially used a z-score to detect unusually large failure counts:
 
 $$
+
 z = \frac{x-\mu}{\sigma}
+
 $$
 
 However, I discovered that z-scores were not reliable when expected failure counts were small because the underlying distribution was not well-approximated by a symmetric normal distribution.
@@ -55,18 +59,22 @@ However, I discovered that z-scores were not reliable when expected failure coun
 So I switched to the **Poisson distribution** for appropriate cases:
 
 $$
+
 X \sim \text{Poisson}(\lambda)
+
 $$
 
 where:
 
 $$
+
 \lambda=np
+
 $$
 
 This allowed the system to calculate the probability of observing a particular number of failures directly.
 
-###  In simple terms
+### **In simple terms**
 
 V1 answers:
 
@@ -76,7 +84,7 @@ Instead of simply saying that the number of failures looks high, the system calc
 
 ---
 
-## V2 — Bayesian Failure Attribution
+## **V2 — Bayesian Failure Attribution**
 
 After detecting abnormal behavior, I wanted the system to answer a harder question:
 
@@ -85,7 +93,9 @@ After detecting abnormal behavior, I wanted the system to answer a harder questi
 I introduced **Bayesian inference**:
 
 $$
+
 P(C|E)=\frac{P(E|C)P(C)}{P(E)}
+
 $$
 
 where:
@@ -103,7 +113,7 @@ and used the available evidence to calculate the probability of each cause.
 
 I also added a 3×3 confusion matrix and ran the simulator 10,000 times. The average classification accuracy was approximately **98%**.
 
-###  In simple terms
+### **In simple terms**
 
 * **V1 asks:** *"Something is wrong — how unusual is it?"*
 * **V2 asks:** *"Something is wrong — what is the most likely reason?"*
@@ -112,7 +122,7 @@ Instead of hardcoding the answer, the system uses evidence to determine the most
 
 ---
 
-## V3 — NASA Telemetry Anomaly Detection
+## **V3 — NASA Telemetry Anomaly Detection**
 
 For V3, I moved from simulated data to the real **NASA SMAP/MSL anomaly detection dataset**.
 
@@ -129,7 +139,9 @@ The models use a rolling window of **10 previous observations** to predict the n
 For a prediction \(\hat{x}_t\), the prediction error is:
 
 $$
+
 e_t = |x_t-\hat{x}_t|
+
 $$
 
 An anomaly is detected when the error becomes sufficiently large.
@@ -137,12 +149,14 @@ An anomaly is detected when the error becomes sufficiently large.
 The threshold is based on validation error:
 
 $$
+
 T=\mu_e+k\sigma_e
+
 $$
 
 I experimented with multiple threshold values and different persistence requirements.
 
-### In simple terms
+### **In simple terms**
 
 Instead of asking:
 
@@ -156,37 +170,41 @@ If the prediction is very wrong, the behavior may be anomalous.
 
 ---
 
-# Models
+# **Models**
 
-### Linear Regression
+### **Linear Regression**
 
 Uses the previous 10 observations to predict the next telemetry value.
 
-### Random Forest
+### **Random Forest**
 
 Uses an ensemble of decision trees to model the relationship between recent telemetry values and the next value.
 
-### LSTM
+### **LSTM**
 
 A recurrent neural network designed for sequential data.
 
 The architecture is approximately:
 
-```text
-10 previous values
-       ↓
-   LSTM(50)
-       ↓
-    Dense(1)
-       ↓
-Next-value prediction
-```
+    10 previous values
+
+           ↓
+
+       LSTM(50)
+
+           ↓
+
+        Dense(1)
+
+           ↓
+
+    Next-value prediction
 
 The LSTM was particularly useful for modeling sequential telemetry behavior.
 
 ---
 
-# Threshold & Persistence
+# **Threshold & Persistence**
 
 I experimented with combinations of:
 
@@ -197,24 +215,22 @@ For the LSTM, these parameters were calibrated using validation data and synthet
 
 The final deployed system uses the saved calibration parameters during inference rather than recalculating them every time the application runs.
 
-###  In simple terms
+### **In simple terms**
 
 The system does not panic because of one strange measurement. It looks for unusual behavior that **continues**.
 
 ---
 
-# Architecture
+# **Architecture**
 
 The project is divided into three main stages:
 
 * **V1/V2 — Reliability Simulation**
-
   * Simulates system failures
   * Statistical anomaly assessment
   * Bayesian failure-cause attribution
 
 * **V3 — NASA Telemetry**
-
   * Loads real spacecraft telemetry
   * Uses predictive models for next-value prediction
   * Calculates prediction error
@@ -222,73 +238,105 @@ The project is divided into three main stages:
   * Evaluates detections against NASA anomaly labels
 
 * **Deployment**
-
   * Models are pretrained offline
   * Model artifacts and calibration parameters are saved
-  * Streamlit loads the saved artifacts during inference
+  * FastAPI serves the machine-learning backend
+  * HTML/CSS/JavaScript provides the dashboard interface
+  * Vercel hosts the frontend and Python API
 
 ---
 
-# Deployment
+# **API Status Note**
+
+When the deployed dashboard is first opened, the API status may initially appear as **"API Offline"**.
+
+This does **not** mean that the backend is broken.
+
+The API becomes active when the user starts an analysis/simulation by clicking the **Run Analysis** button. After the request is successfully sent, the dashboard updates the status to **"API Online"**.
+
+Therefore, the initial **"API Offline"** status is expected behavior and does not prevent the application from working.
+
+---
+
+# **Deployment**
 
 Training the LSTM models every time the application starts would be too expensive for a free cloud deployment. So I separated pretraining from inference:
 
-```text
-Pretraining
-     ↓
-Saved models
-     ↓
-Calibration parameters
-     ↓
-Streamlit App
-     ↓
-Dashboard Inference
-```
+    Pretraining
+         ↓
+    Saved models
+         ↓
+    Calibration parameters
+         ↓
+    FastAPI Backend
+         ↓
+    Vercel Deployment
+         ↓
+    HTML Dashboard
+         ↓
+    Dashboard Inference
 
 * `pretrain.py` trains the models and saves them inside the `models/` directory.
-* The Streamlit application then loads those saved models instead of retraining them.
 
-### Live application
+* The FastAPI backend then loads those saved models instead of retraining them.
+
+* The HTML/CSS/JavaScript dashboard communicates with the FastAPI backend through API endpoints.
+
+* Vercel hosts the deployed dashboard and backend.
+
+### **Live application**
 
 The final system is deployed here:
 
-**[Open the Smart Reliability & Failure Predictor](https://smart-reliability-predictor-xf8m7suhusz4mu9tp8lert.streamlit.app/)**
+**[Open the Smart Reliability & Failure Predictor](https://smart-reliability-predictor.vercel.app/)**
 
 ---
 
-# Tech Stack
+# **Tech Stack**
 
 * **Language:** Python
+
 * **Data Processing:** NumPy, Pandas
+
 * **Machine Learning:** Scikit-learn, TensorFlow / Keras, Joblib
-* **UI & Visuals:** Streamlit, Matplotlib
+
+* **Backend:** FastAPI
+
+* **Frontend:** HTML, CSS, JavaScript
+
+* **UI & Visuals:** HTML/CSS/JavaScript, Matplotlib
+
+* **Deployment:** Vercel
+
 * **Dataset:** NASA SMAP/MSL dataset
 
 ---
 
-# Running Locally
+# **Running Locally**
 
 Install the dependencies:
 
-```bash
-pip install -r requirements.txt
-```
+    pip install -r requirements.txt
 
 Pretrain the models:
 
-```bash
-python pretrain.py
-```
+    python pretrain.py
 
-Then start the dashboard:
+Then start the FastAPI backend:
 
-```bash
-streamlit run app.py
-```
+    python -m uvicorn api.index:app --port 8000
+
+The API will be available at:
+
+    http://127.0.0.1:8000
+
+The API documentation can also be accessed at:
+
+    http://127.0.0.1:8000/docs
 
 ---
 
-# Limitations
+# **Limitations**
 
 This project detects anomalous telemetry behavior. It does not directly prove that a spacecraft or physical system has failed.
 
@@ -296,14 +344,14 @@ The NASA dataset is also challenging: different channels have different behavior
 
 ---
 
-# AI Usage
+# **AI Usage**
 
 I used AI as a learning, planning, and documentation assistant throughout the project. I also used AI to help me understand concepts and approaches when I was stuck.
 
-For coding the index.html file (frontend) is made by ai . Because previously i made it using streamlit but it was not allowed to deploy in in so i switch to vercel than like i need to make the dashboard with html but i didnt know it and dont have enough time .
+For coding the `index.html` file (frontend), I used AI assistance. Originally, I built the dashboard using Streamlit, but Streamlit was not allowed for the final deployment. Because of the limited time available and my lack of experience with building a full HTML dashboard from scratch, I used AI to help create the frontend while I focused on the underlying reliability, statistical, and machine-learning system.
 
 ---
 
-# Author
+# **Author**
 
 Built by **Touheed (Matrix)** as a StarDance project and as part of my journey toward becoming an AI engineer.

@@ -6,3 +6,5 @@ ml_env/
 rough.py
 
 models/
+.vercel
+.env*

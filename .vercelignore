@@ -1,0 +1,6 @@
+﻿ml_env/
+.venv/
+.git/
+.vercel/
+__pycache__/
+.devcontainer/
