@@ -1,108 +1,135 @@
 # Smart Reliability and Failure Predictor
 
-A project that started as a way to practice probability and statistics and ended up as an anomaly detection system running on actual NASA spacecraft telemetry.
-
-It tracks system behavior figures out the likely cause of failures using Bayesian logic and flags strange patterns in telemetry data using machine learning.
-
-
+This project started when I was learning probability and statistics for AI engineering. I wanted to use what I was learning in a real project instead of only studying theory.
+It started as a simple failure simulation and later became an anomaly detection system using real NASA spacecraft telemetry.
 
 ## Live Demo
 
-Check out the Live Dashboard: https://smart-reliability-predictor.vercel.app/
+[Open the Live Dashboard](https://smart-reliability-predictor.vercel.app/)
 
-Quick heads up: The status badge shows API Offline when you first load the page. That is normal. It starts up as soon as you click Run Analysis.
-
-
+Note: The API status can show Offline when the dashboard is opened for the first time. This is normal for my deployment. It starts working when an analysis is run.
 
 ## My Story
 
-I was studying probability and stats for AI engineering but reading theory gets boring fast. I wanted to actually build something hands on and honestly I was feeling inspired after watching Spider-Man Brand New Day.
-
-I decided to build this as part of StarDance. The goal was simple  create a reliability monitor that does not just catch errors but actually works out why they are happening.
-
-
+I was studying probability and statistics for AI engineering, but I wanted to learn by building something.
+Like i also recently watched Spiderman brand new day so my inner engineer was rising and i wanted to build something .
+I made this project as part of StarDance. My main goal was to build a system that can detect problems and also try to find their possible cause.
 
 ## How the Project Evolved
 
-### V1 — Basic Statistical Monitoring
-The first version simulated a system receiving requests with a specific failure rate.
+### V1 - Statistical Monitoring
 
-* First try: I tried using Z-scores to spot high failure counts. That broke down on small sample sizes because the distribution was not a neat normal curve.
-* The fix: I switched to a Poisson distribution where lambda equals n times p which handles rare low count events much better.
-* What it does: V1 tells you if a sudden jump in failures is actually unusual or just normal randomness.
+The first version was a failure simulation.
 
-### V2 — Finding the Cause with Bayes
-Once V1 flags an issue V2 tries to answer a harder question: what caused it?
+I first tried using Z-scores to find unusual failure counts. It did not work well for smaller sample sizes, so I changed it to a Poisson distribution.
 
-I used Bayes Theorem to calculate the likelihood of different root causes:
+The main idea is:
 
-P(C|E) = P(E|C) * P(C) / P(E)
+$$\lambda = n \times p$$
 
-The system checks the evidence against three common problems:
-* Database overload
-* Server overload
-* Network issues
+V1 checks if the observed number of failures is unusual compared to the expected number.
 
-I tested this with a 10000 run simulation and got an average classification accuracy of about 98 percent.
+### V2 - Finding the Cause
 
-### V3 — Real NASA Telemetry
-For V3 I dropped simulated data and loaded up the real NASA SMAP and MSL anomaly dataset.
+After V1, I wanted to find out why a failure might be happening.
 
-Real spacecraft telemetry is messy. Instead of writing rigid rules for what counts as an anomaly I trained models to look at the last 10 data points and predict what the next value should be.
+I used Bayes' Theorem:
 
-If the real reading is far off from the predicted reading it flags an anomaly. I also added a persistence rule so a single weird spike does not trigger a false alarm. The error has to stay high over multiple readings.
+$$P(C\vert{}E) = \frac{P(E\vert{}C) \cdot P(C)}{P(E)}$$
 
+The system checks three possible causes:
 
+- Database overload
+- Server overload
+- Network issues
+
+I tested it with a 10,000-run simulation and got an average classification accuracy of about 98%.
+
+### V3 - NASA Telemetry
+
+For V3, I moved from simulated data to real NASA telemetry data from the **SMAP and MSL anomaly datasets**.
+The dataset contain many channels and they were classified into 2 types - point and contextual .
+
+The models use the previous 10 readings to predict the next value.
+
+If the actual value is far from the prediction, it can be marked as an anomaly.
+
+I also added a persistence rule so that one random spike does not immediately create an alert. The error needs to stay high across multiple readings.
 
 ## Models Tested
 
-* Linear Regression: A simple baseline using the last 10 readings.
-* Random Forest: Good at picking up non-linear patterns across the window.
-* LSTM: Worked best for sequential time series data.
-* Structure: 10 inputs to LSTM with 50 units to Dense layer to Next value prediction
+I tested three models:
 
+- Linear Regression - Used as a simple baseline.
+- Random Forest - Used to find non-linear patterns.
+- LSTM - Used for the sequential time-series data.
 
+The LSTM structure is:
+
+`10 inputs` $\rightarrow$ `LSTM (50 units)` $\rightarrow$ `Dense layer` $\rightarrow$ `Next value`
 
 ## Architecture and Deployment
 
-* Tech Stack: Python NumPy Pandas Scikit-learn TensorFlow Keras FastAPI HTML CSS JS Vercel
-* How it runs:
-  1. Models are trained offline using pretrain.py
-  2. Saved model files and thresholds are stored
-  3. FastAPI loads the saved models and serves predictions
-  4. The frontend dashboard talks to FastAPI and displays the results
+### Tech Stack
 
-By separating training from inference the app runs quickly on free hosting without needing to retrain every time.
+- Python
+- NumPy
+- Pandas
+- Scikit-learn
+- TensorFlow / Keras
+- FastAPI
+- HTML
+- CSS
+- JavaScript
+- Vercel
 
+### How It Works
 
+1. Models are trained using `pretrain.py`.
+2. The trained models and thresholds are saved.
+3. FastAPI loads the saved models.
+4. The dashboard sends requests to the API.
+5. The results are shown on the dashboard.
+
+Training and prediction are kept separate so the deployed app does not need to train the models every time.
 
 ## Running Locally
 
-1. Install dependencies:
-   pip install -r requirements.txt
+Install the dependencies:
 
-2. Generate model files:
-   python pretrain.py
 
-3. Start the server:
-   python -m uvicorn api.index:app --port 8000
+pip install -r requirements.txt
 
-4. Open http://127.0.0.1:8000 in your browser.
 
+Train the models:
+
+
+python pretrain.py
+
+
+Start the server:
+
+
+python -m uvicorn api.index:app --port 8000
+
+
+Then open:
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ## Limitations
 
-* Anomalies do not equal Hardware Failures: The system flags mathematical deviations in telemetry but that does not always mean a physical part on the spacecraft broke.
-* Single Channel Focus: Some complex spacecraft issues can only be caught by looking at multiple sensor channels at the same time.
-
-
+- Anomalies are not Hardware Failures: An anomaly only means that the telemetry value is different from what the model expected. It does not automatically mean that a physical part has failed.
+- Single Channel Focus: The current system mainly looks at one telemetry channel at a time. Some spacecraft problems may need multiple channels to be checked together.
 
 ## AI Usage
 
-I used AI throughout the project as a tutor to help break down statistical concepts  and for documentation of languages
+I used AI mainly as a tutor during the project. It helped me understand some probability, statistics, and machine learning concepts, as well as programming and documentation questions. I tested the code myself, fixed errors, and made changes while building the project.
 
 
 
-Built by Touheed Matrix as part of my journey toward becoming an AI engineer.
+### Final Note
 
+This project started as a way to practice probability and statistics and grew into a project about anomaly detection, time-series data, machine learning, and deployment.
+
+Built by Touheed (Matrix) as part of my journey toward becoming an AI engineer.
 
