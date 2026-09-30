@@ -99,10 +99,10 @@ By separating training from inference the app runs quickly on free hosting witho
 
 ## AI Usage
 
-I used AI throughout the project as a tutor to help break down statistical concepts  and for documentation.
-
-I also used AI to help build the HTML dashboard index.html file  thats the only part , rest all the code is writteen by me and devlogged. I originally built the interface using Streamlit but Streamlit could not be used for the final deployment. Since I had limited time and was not experienced with HTML and JS I used AI to port the interface so I could stay focused on the backend algorithms and ML logic.
+I used AI throughout the project as a tutor to help break down statistical concepts  and for documentation of languages
 
 
 
 Built by Touheed Matrix as part of my journey toward becoming an AI engineer.
+
+
