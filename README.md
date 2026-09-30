@@ -1,357 +1,108 @@
-# **Smart Reliability & Failure Predictor**
+# Smart Reliability and Failure Predictor
 
-A reliability and anomaly-detection system that evolved from probability-based failure analysis into a machine-learning system for real NASA spacecraft telemetry.
+A project that started as a way to practice probability and statistics and ended up as an anomaly detection system running on actual NASA spacecraft telemetry.
 
-The project combines probability, statistics, Bayesian inference, and machine learning to detect unusual behavior, investigate possible causes, and identify anomalies in real telemetry data.
+It tracks system behavior figures out the likely cause of failures using Bayesian logic and flags strange patterns in telemetry data using machine learning.
 
----
 
-## **Live Demo**
 
-**Try the deployed application:**
+## Live Demo
 
-[Smart Reliability & Failure Predictor](https://smart-reliability-predictor.vercel.app/)
+Check out the Live Dashboard: https://smart-reliability-predictor.vercel.app/
 
-The deployed dashboard contains the V1/V2 reliability simulator and the V3 NASA telemetry anomaly-detection system.
+Quick heads up: The status badge shows API Offline when you first load the page. That is normal. It starts up as soon as you click Run Analysis.
 
----
 
-## **My Story**
 
-I had been studying probability and statistics for AI engineering, but I was mostly just consuming theory. I wanted to actually build something—my inner engineer was coming out (especially after watching *Spider-Man: Brand New Day*!).
+## My Story
 
-That led me to **StarDance**, where I decided to build a reliability system that could detect abnormal behavior and eventually understand why it was happening.
+I was studying probability and stats for AI engineering but reading theory gets boring fast. I wanted to actually build something hands on and honestly I was feeling inspired after watching Spider-Man Brand New Day.
 
----
+I decided to build this as part of StarDance. The goal was simple  create a reliability monitor that does not just catch errors but actually works out why they are happening.
 
-# **Project Evolution**
 
-## **V1 — Probability-Based Reliability Analysis**
 
-The first version simulated a system receiving requests with a certain probability of failure.
+## How the Project Evolved
 
-I used the **Binomial distribution** to model failures:
+### V1 — Basic Statistical Monitoring
+The first version simulated a system receiving requests with a specific failure rate.
 
-$$
+* First try: I tried using Z-scores to spot high failure counts. That broke down on small sample sizes because the distribution was not a neat normal curve.
+* The fix: I switched to a Poisson distribution where lambda equals n times p which handles rare low count events much better.
+* What it does: V1 tells you if a sudden jump in failures is actually unusual or just normal randomness.
 
-X \sim \text{Binomial}(n,p)
+### V2 — Finding the Cause with Bayes
+Once V1 flags an issue V2 tries to answer a harder question: what caused it?
 
-$$
+I used Bayes Theorem to calculate the likelihood of different root causes:
 
-with expected failures:
+P(C|E) = P(E|C) * P(C) / P(E)
 
-$$
-
-E[X] = np
-
-$$
-
-I initially used a z-score to detect unusually large failure counts:
-
-$$
-
-z = \frac{x-\mu}{\sigma}
-
-$$
-
-However, I discovered that z-scores were not reliable when expected failure counts were small because the underlying distribution was not well-approximated by a symmetric normal distribution.
-
-So I switched to the **Poisson distribution** for appropriate cases:
-
-$$
-
-X \sim \text{Poisson}(\lambda)
-
-$$
-
-where:
-
-$$
-
-\lambda=np
-
-$$
-
-This allowed the system to calculate the probability of observing a particular number of failures directly.
-
-### **In simple terms**
-
-V1 answers:
-
-> **"Is this system behaving unusually?"**
-
-Instead of simply saying that the number of failures looks high, the system calculates what should normally happen and compares that with what actually happened.
-
----
-
-## **V2 — Bayesian Failure Attribution**
-
-After detecting abnormal behavior, I wanted the system to answer a harder question:
-
-> **"What is probably causing it?"**
-
-I introduced **Bayesian inference**:
-
-$$
-
-P(C|E)=\frac{P(E|C)P(C)}{P(E)}
-
-$$
-
-where:
-
-* C = possible cause
-* E = observed evidence
-
-The system considered possible causes such as:
-
+The system checks the evidence against three common problems:
 * Database overload
 * Server overload
 * Network issues
 
-and used the available evidence to calculate the probability of each cause.
+I tested this with a 10000 run simulation and got an average classification accuracy of about 98 percent.
 
-I also added a 3×3 confusion matrix and ran the simulator 10,000 times. The average classification accuracy was approximately **98%**.
+### V3 — Real NASA Telemetry
+For V3 I dropped simulated data and loaded up the real NASA SMAP and MSL anomaly dataset.
 
-### **In simple terms**
+Real spacecraft telemetry is messy. Instead of writing rigid rules for what counts as an anomaly I trained models to look at the last 10 data points and predict what the next value should be.
 
-* **V1 asks:** *"Something is wrong — how unusual is it?"*
-* **V2 asks:** *"Something is wrong — what is the most likely reason?"*
+If the real reading is far off from the predicted reading it flags an anomaly. I also added a persistence rule so a single weird spike does not trigger a false alarm. The error has to stay high over multiple readings.
 
-Instead of hardcoding the answer, the system uses evidence to determine the most probable cause.
 
----
 
-## **V3 — NASA Telemetry Anomaly Detection**
+## Models Tested
 
-For V3, I moved from simulated data to the real **NASA SMAP/MSL anomaly detection dataset**.
+* Linear Regression: A simple baseline using the last 10 readings.
+* Random Forest: Good at picking up non-linear patterns across the window.
+* LSTM: Worked best for sequential time series data.
+* Structure: 10 inputs to LSTM with 50 units to Dense layer to Next value prediction
 
-The challenge became much harder because different telemetry channels behaved differently. Some contained clear point anomalies, while others had contextual patterns that could not be captured using simple rules.
 
-I experimented with:
 
-* Linear Regression
-* Random Forest
-* LSTM
+## Architecture and Deployment
 
-The models use a rolling window of **10 previous observations** to predict the next value.
+* Tech Stack: Python NumPy Pandas Scikit-learn TensorFlow Keras FastAPI HTML CSS JS Vercel
+* How it runs:
+  1. Models are trained offline using pretrain.py
+  2. Saved model files and thresholds are stored
+  3. FastAPI loads the saved models and serves predictions
+  4. The frontend dashboard talks to FastAPI and displays the results
 
-For a prediction \(\hat{x}_t\), the prediction error is:
+By separating training from inference the app runs quickly on free hosting without needing to retrain every time.
 
-$$
 
-e_t = |x_t-\hat{x}_t|
 
-$$
+## Running Locally
 
-An anomaly is detected when the error becomes sufficiently large.
+1. Install dependencies:
+   pip install -r requirements.txt
 
-The threshold is based on validation error:
+2. Generate model files:
+   python pretrain.py
 
-$$
+3. Start the server:
+   python -m uvicorn api.index:app --port 8000
 
-T=\mu_e+k\sigma_e
+4. Open http://127.0.0.1:8000 in your browser.
 
-$$
 
-I experimented with multiple threshold values and different persistence requirements.
+## Limitations
 
-### **In simple terms**
+* Anomalies do not equal Hardware Failures: The system flags mathematical deviations in telemetry but that does not always mean a physical part on the spacecraft broke.
+* Single Channel Focus: Some complex spacecraft issues can only be caught by looking at multiple sensor channels at the same time.
 
-Instead of asking:
 
-> **"Is this telemetry value unusually large?"**
 
-the system asks:
+## AI Usage
 
-> **"Could the model have predicted this value from the recent behavior?"**
+I used AI throughout the project as a tutor to help break down statistical concepts and debug code when I got stuck.
 
-If the prediction is very wrong, the behavior may be anomalous.
+I also used AI to help build the HTML dashboard. I originally built the interface using Streamlit but Streamlit could not be used for the final deployment. Since I had limited time and was not experienced with HTML and JS I used AI to port the interface so I could stay focused on the backend algorithms and ML logic.
 
----
 
-# **Models**
 
-### **Linear Regression**
-
-Uses the previous 10 observations to predict the next telemetry value.
-
-### **Random Forest**
-
-Uses an ensemble of decision trees to model the relationship between recent telemetry values and the next value.
-
-### **LSTM**
-
-A recurrent neural network designed for sequential data.
-
-The architecture is approximately:
-
-    10 previous values
-
-           ↓
-
-       LSTM(50)
-
-           ↓
-
-        Dense(1)
-
-           ↓
-
-    Next-value prediction
-
-The LSTM was particularly useful for modeling sequential telemetry behavior.
-
----
-
-# **Threshold & Persistence**
-
-I experimented with combinations of:
-
-* **Threshold multipliers:** 1, 1.5, 2, 2.5, 3, 3.5
-* **Persistence:** 1, 2, 3, 5
-
-For the LSTM, these parameters were calibrated using validation data and synthetic anomaly scenarios, and the selected parameters were saved alongside the pretrained model. The other models use their calibrated detection threshold with a persistence requirement.
-
-The final deployed system uses the saved calibration parameters during inference rather than recalculating them every time the application runs.
-
-### **In simple terms**
-
-The system does not panic because of one strange measurement. It looks for unusual behavior that **continues**.
-
----
-
-# **Architecture**
-
-The project is divided into three main stages:
-
-* **V1/V2 — Reliability Simulation**
-  * Simulates system failures
-  * Statistical anomaly assessment
-  * Bayesian failure-cause attribution
-
-* **V3 — NASA Telemetry**
-  * Loads real spacecraft telemetry
-  * Uses predictive models for next-value prediction
-  * Calculates prediction error
-  * Applies threshold + persistence-based anomaly detection
-  * Evaluates detections against NASA anomaly labels
-
-* **Deployment**
-  * Models are pretrained offline
-  * Model artifacts and calibration parameters are saved
-  * FastAPI serves the machine-learning backend
-  * HTML/CSS/JavaScript provides the dashboard interface
-  * Vercel hosts the frontend and Python API
-
----
-
-# **API Status Note**
-
-When the deployed dashboard is first opened, the API status may initially appear as **"API Offline"**.
-
-This does **not** mean that the backend is broken.
-
-The API becomes active when the user starts an analysis/simulation by clicking the **Run Analysis** button. After the request is successfully sent, the dashboard updates the status to **"API Online"**.
-
-Therefore, the initial **"API Offline"** status is expected behavior and does not prevent the application from working.
-
----
-
-# **Deployment**
-
-Training the LSTM models every time the application starts would be too expensive for a free cloud deployment. So I separated pretraining from inference:
-
-    Pretraining
-         ↓
-    Saved models
-         ↓
-    Calibration parameters
-         ↓
-    FastAPI Backend
-         ↓
-    Vercel Deployment
-         ↓
-    HTML Dashboard
-         ↓
-    Dashboard Inference
-
-* `pretrain.py` trains the models and saves them inside the `models/` directory.
-
-* The FastAPI backend then loads those saved models instead of retraining them.
-
-* The HTML/CSS/JavaScript dashboard communicates with the FastAPI backend through API endpoints.
-
-* Vercel hosts the deployed dashboard and backend.
-
-### **Live application**
-
-The final system is deployed here:
-
-**[Open the Smart Reliability & Failure Predictor](https://smart-reliability-predictor.vercel.app/)**
-
----
-
-# **Tech Stack**
-
-* **Language:** Python
-
-* **Data Processing:** NumPy, Pandas
-
-* **Machine Learning:** Scikit-learn, TensorFlow / Keras, Joblib
-
-* **Backend:** FastAPI
-
-* **Frontend:** HTML, CSS, JavaScript
-
-* **UI & Visuals:** HTML/CSS/JavaScript, Matplotlib
-
-* **Deployment:** Vercel
-
-* **Dataset:** NASA SMAP/MSL dataset
-
----
-
-# **Running Locally**
-
-Install the dependencies:
-
-    pip install -r requirements.txt
-
-Pretrain the models:
-
-    python pretrain.py
-
-Then start the FastAPI backend:
-
-    python -m uvicorn api.index:app --port 8000
-
-The API will be available at:
-
-    http://127.0.0.1:8000
-
-The API documentation can also be accessed at:
-
-    http://127.0.0.1:8000/docs
-
----
-
-# **Limitations**
-
-This project detects anomalous telemetry behavior. It does not directly prove that a spacecraft or physical system has failed.
-
-The NASA dataset is also challenging: different channels have different behavior, and some contextual anomalies are difficult to detect from a single telemetry channel. The project is therefore primarily an exploration of how statistical reasoning and machine learning can be combined for reliability analysis.
-
----
-
-# **AI Usage**
-
-I used AI as a learning, planning, and documentation assistant throughout the project. I also used AI to help me understand concepts and approaches when I was stuck.
-
-For coding the `index.html` file (frontend), I used AI assistance. Originally, I built the dashboard using Streamlit, but Streamlit was not allowed for the final deployment. Because of the limited time available and my lack of experience with building a full HTML dashboard from scratch, I used AI to help create the frontend while I focused on the underlying reliability, statistical, and machine-learning system.
-
----
-
-# **Author**
-
-Built by **Touheed (Matrix)** as a StarDance project and as part of my journey toward becoming an AI engineer.
+Built by Touheed Matrix as part of my journey toward becoming an AI engineer.
