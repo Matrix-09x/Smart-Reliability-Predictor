@@ -1,1497 +1,982 @@
 <!DOCTYPE html>
-<html lang="en">
+
+
+
+
+<html>
+
+
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>NASA Spacecraft Reliability Engine</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
 
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background:
-                radial-gradient(circle at top right, #102b49 0%, transparent 35%),
-                linear-gradient(135deg, #050b14, #0b1625, #07111f);
-            color: #f4f7fb;
-            min-height: 100vh;
+            background: #07111f;
+            color: white;
+
+
+            font-family: Arial;
         }
 
-        .app {
+        
+
+        .dashboard {
             display: flex;
+
             min-height: 100vh;
         }
 
         .sidebar {
-            width: 305px;
-            min-height: 100vh;
-            background: linear-gradient(180deg, #06101d, #030912);
-            border-right: 1px solid #1d3852;
-            padding: 30px 22px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
+            width: 230px;
+            background: #0b1728;
+            
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        .main {
-            margin-left: 305px;
-            width: calc(100% - 305px);
-            padding: 42px 50px;
+        .sidebar h2 {
+            margin-top: 0;
         }
 
-        .mission-title {
-            font-size: 25px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .mission-subtitle {
-            color: #8eafd0;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .separator {
-            height: 1px;
-            background: #1c3955;
-            margin: 30px 0;
-        }
-
-        .sidebar-label {
-            color: #83a5c7;
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
+        .sidebar p {
+            color: #aebccc;
         }
 
         .module-button {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid transparent;
-            border-radius: 9px;
-            background: transparent;
-            color: #cbd9e8;
-            text-align: left;
+            padding: 12px;
+            margin-top: 10px;
+
+            background: #101c2e;
+            color: white;
+            border: 1px solid #263b52;
             cursor: pointer;
-            font-size: 14px;
-            transition: 0.2s;
+            text-align: left;
         }
 
         .module-button:hover {
-            background: #0d2338;
+            background: #1a2d45;
         }
 
-        .module-button.active {
-            background: #102c47;
-            border-color: #28608c;
-            color: white;
+        .main {
+            flex: 1;
+            padding: 30px;
+
+            max-width: 1100px;
         }
 
-        .system-card {
-            margin-top: 45px;
-            padding: 18px;
-            border-radius: 10px;
-            border: 1px solid #1d3b57;
-            background: #071522;
+        .main > p {
+            color: #aebccc;
         }
 
-        .system-title {
-            color: #86a8ca;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
+        .configuration {
+            background: #0d1a2b;
+            border: 1px solid #20344a;
+            padding: 20px;
+
+
+            margin-top: 25px;
+            border-radius: 8px;
         }
 
-        .api-status {
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .api-online {
-            color: #58e49b;
-        }
-
-        .api-offline {
-            color: #ff7777;
-        }
-
-        .page-title {
-            font-size: 42px;
-            line-height: 1.15;
-            margin: 0 0 18px 0;
-            font-weight: 750;
-        }
-
-        .page-subtitle {
-            color: #91b4d8;
-            font-size: 17px;
-            margin-bottom: 42px;
-            line-height: 1.6;
-        }
-
-        h2 {
-            font-size: 28px;
-            margin-top: 35px;
-            margin-bottom: 20px;
-        }
-
-        h3 {
-            font-size: 21px;
-            margin-bottom: 12px;
-        }
-
-        .section {
-            margin-bottom: 35px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-        }
-
-        .card {
-            background: rgba(6, 20, 34, 0.88);
-            border: 1px solid #1c3a56;
-            border-radius: 12px;
-            padding: 22px;
-        }
-
-        .metric-label {
-            color: #8caecc;
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
-
-        .metric-value {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .info-card {
-            background: #071522;
-            border: 1px solid #1c3852;
-            border-radius: 10px;
-            padding: 22px;
-            line-height: 1.65;
-            color: #cbd9e8;
+        .form-group {
+            margin-top: 18px;
         }
 
         label {
             display: block;
-            color: #91afd0;
-            font-size: 14px;
-            margin-bottom: 9px;
+            margin-bottom: 7px;
         }
 
         input,
         select {
             width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: 1px solid #294761;
-            background: #06111c;
+            padding: 11px;
+            box-sizing: border-box;
+            background: #101c2e;
+
             color: white;
-            font-size: 15px;
-            outline: none;
+            border: 1px solid #2a4058;
         }
 
-        input:focus,
-        select:focus {
-            border-color: #3489d4;
-        }
+        .run-button {
+            margin-top: 20px;
+            padding: 11px 18px;
+            background: #172a40;
 
-        .input-card {
-            background: rgba(6, 20, 34, 0.9);
-            border: 1px solid #1c3a56;
-            border-radius: 11px;
-            padding: 20px;
-        }
-
-        button.primary {
-            background: #1677e8;
             color: white;
-            border: none;
-            padding: 15px 23px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 700;
+            border: 1px solid #31506b;
             cursor: pointer;
+        }
+
+        .run-button:hover {
+            background: #203b59;
+        }
+
+        .run-button:disabled {
+            opacity: 0.6;
+        }
+
+        .card-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .card {
+            flex: 1;
+
+            background: #101c2e;
+            border: 1px solid #20344a;
+            border-radius: 8px;
+            padding: 20px;
             margin-top: 20px;
         }
 
-        button.primary:hover {
-            background: #2588f7;
+        .card h2 {
+            margin-top: 0;
+            font-size: 18px;
         }
 
-        button.primary:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
+        .value {
+            font-size: 25px;
+            color: #dbe8f5;
         }
 
-        .status {
-            padding: 15px 18px;
-            border-radius: 9px;
-            margin: 18px 0;
-            font-size: 15px;
+        .details {
+            color: #b8c4d4;
+            line-height: 1.8;
         }
 
-        .status.success {
-            background: rgba(28, 113, 75, 0.2);
-            border: 1px solid #267b56;
-            color: #72e8a9;
+        .message {
+            color: #b8c4d4;
         }
 
-        .status.warning {
-            background: rgba(125, 94, 26, 0.2);
-            border: 1px solid #80651d;
-            color: #f4d36b;
+        .online {
+            color: #7ee787 !important;
         }
 
-        .status.error {
-            background: rgba(125, 30, 30, 0.25);
-            border: 1px solid #853838;
-            color: #ff9999;
+        .offline {
+            color: #ff7b72 !important;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border: 1px solid #213c55;
-            text-align: center;
-        }
-
-        th {
-            background: #0b2034;
-            color: #9fc0df;
-        }
-
-        td {
-            background: #071522;
-        }
-
-        .chart-container {
-            background: #06111c;
-            border: 1px solid #1c3a56;
-            border-radius: 10px;
-            padding: 18px;
-            margin-top: 15px;
-        }
-
-        canvas {
-            width: 100%;
-            max-height: 350px;
-        }
-
-        .figure-container {
-            background: #06111c;
-            border: 1px solid #1c3a56;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            overflow-x: auto;
-        }
-
-        .figure-container img {
-            width: 100%;
-            max-width: 1200px;
-            display: block;
-            margin: auto;
-        }
-
-        .formula {
-            font-family: "Times New Roman", serif;
-            font-size: 22px;
-            text-align: center;
-            padding: 20px;
-            color: #dcecff;
-        }
-
-        .loading {
+        #v3Module {
             display: none;
-            margin-top: 18px;
-            color: #7fb6e9;
         }
 
-        .loading.show {
-            display: block;
+        #telemetryFigure {
+            width: 100%;
+
+            margin-top: 15px;
         }
 
-        @media (max-width: 1000px) {
-            .sidebar {
-                position: relative;
-                width: 100%;
-                min-height: auto;
-            }
+        @media (max-width: 800px) {
 
-            .app {
+            .dashboard {
                 display: block;
             }
 
-            .main {
-                margin-left: 0;
+            .sidebar {
                 width: 100%;
-                padding: 30px 20px;
             }
 
-            .grid-2,
-            .grid-3,
-            .grid-4 {
-                grid-template-columns: 1fr;
+            .main {
+                padding: 20px;
             }
 
-            .page-title {
-                font-size: 32px;
+            .card-row {
+                display: block;
             }
+
         }
+
     </style>
+
 </head>
 
 <body>
 
-<div class="app">
+    <div class="dashboard">
 
-    <aside class="sidebar">
+        <div class="sidebar">
 
-        <div class="mission-title">
-            🚀 Mission Control
-        </div>
+            <h2>🚀 Mission Control</h2>
 
-        <div class="mission-subtitle">
-            NASA Spacecraft Reliability Engine
-        </div>
-
-        <div class="separator"></div>
-
-        <div class="sidebar-label">
-            Choose a module
-        </div>
-
-        <button
-            id="v1v2Button"
-            class="module-button active"
-            onclick="showModule('v1v2')"
-        >
-            📊 V1/V2 : Reliability Simulator
-        </button>
-
-        <button
-            id="v3Button"
-            class="module-button"
-            onclick="showModule('v3')"
-        >
-            🛰️ V3 : NASA Telemetry Analysis
-        </button>
-
-        <div class="system-card">
-
-            <div class="system-title">
-                System
-            </div>
-
-            <div id="apiStatus" class="api-status api-offline">
-                🔴 API Offline
-            </div>
-
-        </div>
-
-    </aside>
-
-    <main class="main">
-
-        <section id="v1v2Module">
-
-            <h1 class="page-title">
-                📊 Probabilistic Reliability Simulator and Bayesian Failure Attribution
-            </h1>
-
-            <div class="page-subtitle">
-                Simulate system failures using probability and identify
-                the most probable failure cause using Bayesian inference.
-            </div>
-
-            <h2>
-                Simulation Configuration
-            </h2>
-
-            <div class="grid-2">
-
-                <div class="input-card">
-
-                    <label for="requestsInput">
-                        Number of requests
-                    </label>
-
-                    <input
-                        id="requestsInput"
-                        type="number"
-                        min="1"
-                        value="10000"
-                    >
-
-                </div>
-
-                <div class="input-card">
-
-                    <label for="probabilityInput">
-                        Failure probability
-                    </label>
-
-                    <input
-                        id="probabilityInput"
-                        type="number"
-                        min="0.1"
-                        max="1"
-                        step="0.01"
-                        value="0.9"
-                    >
-
-                </div>
-
-            </div>
+            <p>Choose module</p>
 
             <button
-                id="reliabilityButton"
-                class="primary"
-                onclick="runReliabilitySimulation()"
+                class="module-button"
+
+                id="v1v2Button"
             >
-                🚀 Run Reliability Simulation
+                📊 V1 / V2
             </button>
 
-            <div id="reliabilityLoading" class="loading">
-                Running probabilistic simulation...
-            </div>
+            <button
+                class="module-button"
+                id="v3Button"
+            >
+                🛰️ V3
+            </button>
 
-            <div id="reliabilityError"></div>
+            <p>System</p>
 
-            <div id="reliabilityResults" style="display:none;">
+            <p
+                id="apiStatus"
 
-                <h2>
-                    System Status
-                </h2>
+                class="offline"
+            >
+                🔴 API Offline
+            </p>
 
-                <div class="grid-4">
+        </div>
 
-                    <div class="card">
-                        <div class="metric-label">
-                            Expected failures
-                        </div>
-                        <div id="expectedFailures" class="metric-value">
-                            —
-                        </div>
+
+        <div class="main">
+
+            <h1>NASA Spacecraft Reliability Engine</h1>
+
+            <p>
+                This system analyzes spacecraft reliability and telemetry anomalies.
+            </p>
+
+
+            <section id="v1v2Module">
+
+                <div class="configuration">
+
+                    <h2>Reliability Simulation</h2>
+
+                    <div class="form-group">
+
+                        <label for="requests">
+                            Number of Requests
+                        </label>
+
+                        <input
+                            id="requests"
+                            type="number"
+                            value="10000"
+                            min="1"
+                        >
+
                     </div>
 
-                    <div class="card">
-                        <div class="metric-label">
-                            Observed failures
-                        </div>
-                        <div id="observedFailures" class="metric-value">
-                            —
-                        </div>
+
+                    <div class="form-group">
+
+                        <label for="probability">
+                            Failure Probability
+                        </label>
+
+                        <input
+                            id="probability"
+                            type="number"
+                            value="0.9"
+
+                            min="0"
+                            max="1"
+                            step="0.01"
+                        >
+
                     </div>
 
-                    <div class="card">
-                        <div class="metric-label">
-                            Failure rate
-                        </div>
-                        <div id="failureRate" class="metric-value">
-                            —
-                        </div>
-                    </div>
+
+                    <button
+                        class="run-button"
+                        id="reliabilityButton"
+                    >
+                        RUN RELIABILITY SIMULATION
+                    </button>
+
+                    <p
+                        id="reliabilityMessage"
+                        class="message"
+                    ></p>
+
+                </div>
+
+
+                <div class="card-row">
 
                     <div class="card">
-                        <div class="metric-label">
-                            Simulation accuracy
-                        </div>
-                        <div id="simulationAccuracy" class="metric-value">
-                            —
-                        </div>
+
+                        <h2>Expected Failures</h2>
+
+                        <p
+                            id="expectedFailures"
+
+                            class="value"
+                        >
+                            --
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h2>Observed Failures</h2>
+
+                        <p
+                            id="observedFailures"
+                            class="value"
+                        >
+                            --
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h2>Failure Rate</h2>
+
+                        <p
+                            id="failureRate"
+                            class="value"
+                        >
+                            --
+                        </p>
+
                     </div>
 
                 </div>
 
-                <h2>
-                    Expected vs Observed Failures
-                </h2>
 
-                <div class="chart-container">
-                    <canvas id="failureChart" height="280"></canvas>
+                <div class="card-row">
+
+                    <div class="card">
+
+                        <h2>Simulation Accuracy</h2>
+
+                        <p
+                            id="simulationAccuracy"
+                            class="value"
+                        >
+                            --
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h2>Anomaly Assessment</h2>
+
+                        <p id="statisticalAssessment">
+                            --
+                        </p>
+
+                    </div>
+
                 </div>
 
-                <h2>
-                    Statistical Anomaly Assessment
-                </h2>
 
-                <div id="statisticalAssessment" class="info-card"></div>
+                <div class="card">
 
-                <h2>
-                    Bayesian Failure Attribution
-                </h2>
+                    <h2>Failure Attribution</h2>
 
-                <div class="info-card">
-
-                    <p>
-                        V2 uses Bayesian inference to estimate which failure
-                        cause is most consistent with the observed evidence.
+                    <p id="databaseFailure">
+                        Database: --
                     </p>
 
-                    <div class="formula">
-                        P(C|E) = P(E|C)P(C) / P(E)
+                    <p id="networkFailure">
+                        Network: --
+                    </p>
+
+                    <p id="serverFailure">
+                        Server: --
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h2>Confusion Matrix</h2>
+
+                    <p id="truePositive">
+                        True Positive: --
+                    </p>
+
+                    <p id="falsePositive">
+                        False Positive: --
+                    </p>
+
+                    <p id="trueNegative">
+                        True Negative: --
+                    </p>
+
+                    <p id="falseNegative">
+                        False Negative: --
+                    </p>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h2>Simulation Details</h2>
+
+                    <div
+                        id="simulationDetails"
+                        class="details"
+                    >
+                        --
                     </div>
 
                 </div>
 
-                <h3>
-                    Bayesian Attribution Confusion Matrix
-                </h3>
+            </section>
 
-                <div id="confusionMatrix"></div>
 
-                <h3>
-                    Attribution Performance
-                </h3>
+            <section id="v3Module">
 
-                <div id="attributionPerformance" class="info-card"></div>
+                <div class="configuration">
 
-                <h3>
-                    Simulation Details
-                </h3>
+                    <h2>NASA Telemetry Analysis</h2>
 
-                <div id="simulationDetails" class="info-card"></div>
+                    <div class="form-group">
 
-                <h3>
-                    Analysis Summary
-                </h3>
+                        <label for="channel">
 
-                <div id="analysisSummary" class="info-card"></div>
+                            Telemetry Channel
+                        </label>
 
-                <h3>
-                    Limitations
-                </h3>
+                        <select id="channel">
 
-                <div class="info-card">
+                            <option>
+                                Loading channels...
+                            </option>
 
-                    <ul>
-                        <li>
-                            V1 uses simulated system failures rather than real telemetry.
-                        </li>
+                        </select>
 
-                        <li>
-                            V2 Bayesian attribution depends on the probability assumptions
-                            used for the simulated causes.
-                        </li>
+                    </div>
 
-                        <li>
-                            These modules provide probabilistic reasoning rather than
-                            direct physical diagnosis of spacecraft hardware.
-                        </li>
-                    </ul>
+
+                    <div class="form-group">
+
+                        <label for="model">
+                            Detection Model
+                        </label>
+
+                        <select id="model">
+
+                            <option>
+                                Loading models...
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        class="run-button"
+                        id="telemetryButton"
+                    >
+                        RUN TELEMETRY ANALYSIS
+                    </button>
+
+                    <p
+                        id="telemetryMessage"
+                        class="message"
+                    ></p>
 
                 </div>
 
-            </div>
 
-        </section>
-
-        <section id="v3Module" style="display:none;">
-
-            <h1 class="page-title">
-                🛰️ NASA Spacecraft Telemetry Deep Learning Analysis
-            </h1>
-
-            <div class="page-subtitle">
-                Analyze NASA spacecraft telemetry using machine-learning
-                and deep-learning anomaly detection models.
-            </div>
-
-            <h2>
-                Telemetry Configuration
-            </h2>
-
-            <div class="grid-2">
-
-                <div class="input-card">
-
-                    <label for="channelSelect">
-                        Telemetry channel
-                    </label>
-
-                    <select id="channelSelect">
-                        <option>
-                            Loading channels...
-                        </option>
-                    </select>
-
-                </div>
-
-                <div class="input-card">
-
-                    <label for="modelSelect">
-                        Detection model
-                    </label>
-
-                    <select id="modelSelect">
-
-                        <option value="Linear Regression">
-                            Linear Regression
-                        </option>
-
-                        <option value="Random Forest">
-                            Random Forest
-                        </option>
-
-                        <option value="Long Term Short Memory(LSTM)">
-                            Long Term Short Memory(LSTM)
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-            <button
-                id="telemetryButton"
-                class="primary"
-                onclick="runTelemetryAnalysis()"
-            >
-                🛰️ Analyze Telemetry
-            </button>
-
-            <div id="telemetryLoading" class="loading">
-                Running telemetry analysis...
-            </div>
-
-            <div id="telemetryError"></div>
-
-            <div id="telemetryResults" style="display:none;">
-
-                <h2>
-                    Mission Status
-                </h2>
-
-                <div class="grid-4">
+                <div class="card-row">
 
                     <div class="card">
-                        <div class="metric-label">
-                            Precision
-                        </div>
-                        <div id="precisionValue" class="metric-value">
-                            —
-                        </div>
+
+                        <h2>Precision</h2>
+
+                        <p
+                            id="precision"
+
+                            class="value"
+                        >
+                            --
+                        </p>
+
                     </div>
 
-                    <div class="card">
-                        <div class="metric-label">
-                            Recall
-                        </div>
-                        <div id="recallValue" class="metric-value">
-                            —
-                        </div>
-                    </div>
 
                     <div class="card">
-                        <div class="metric-label">
-                            F1 Score
-                        </div>
-                        <div id="f1Value" class="metric-value">
-                            —
-                        </div>
+
+                        <h2>Recall</h2>
+
+                        <p
+                            id="recall"
+                            class="value"
+                        >
+                            --
+                        </p>
+
                     </div>
 
+
                     <div class="card">
-                        <div class="metric-label">
-                            Anomalies Flagged
-                        </div>
-                        <div id="anomaliesCount" class="metric-value">
-                            —
-                        </div>
+
+                        <h2>F1 Score</h2>
+
+                        <p
+                            id="f1"
+                            class="value"
+                        >
+                            --
+                        </p>
+
                     </div>
 
                 </div>
 
-                <h2>
-                    Detection Configuration
-                </h2>
 
-                <div class="grid-2">
+                <div class="card-row">
 
                     <div class="card">
-                        <div class="metric-label">
-                            Threshold
-                        </div>
-                        <div id="thresholdValue" class="metric-value">
-                            —
-                        </div>
+
+                        <h2>Anomalies</h2>
+
+                        <p
+                            id="anomalies"
+                            class="value"
+                        >
+                            --
+                        </p>
+
                     </div>
 
+
                     <div class="card">
-                        <div class="metric-label">
-                            Persistence
-                        </div>
-                        <div id="persistenceValue" class="metric-value">
-                            —
-                        </div>
+
+                        <h2>Threshold</h2>
+
+                        <p
+                            id="threshold"
+                            class="value"
+                        >
+                            --
+                        </p>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h2>Persistence</h2>
+
+                        <p
+                            id="persistence"
+                            class="value"
+                        >
+                            --
+                        </p>
+
                     </div>
 
                 </div>
 
-                <h2>
-                    NASA Telemetry Analysis
-                </h2>
 
-                <div class="figure-container">
+                <div class="card">
+
+                    <h2>Telemetry Result</h2>
+
+                    <p id="telemetryDetails">
+                        --
+                    </p>
 
                     <img
                         id="telemetryFigure"
-                        alt="NASA telemetry analysis figure"
+                        style="display: none;"
                     >
 
                 </div>
 
-                <h2>
-                    Detection Explanation
-                </h2>
+            </section>
 
-                <div id="detectionExplanation" class="info-card"></div>
+        </div>
 
-                <h2>
-                    Detection Details
-                </h2>
+    </div>
 
-                <div id="detectionDetails" class="info-card"></div>
 
-                <h2>
-                    Performance
-                </h2>
+    <script>
 
-                <div id="performanceTable"></div>
+        const v1v2Button =
+            document.getElementById("v1v2Button");
 
-                <h2>
-                    Analysis Summary
-                </h2>
 
-                <div id="telemetrySummary" class="info-card"></div>
 
-                <h2>
-                    Limitations
-                </h2>
+        const v3Button =
+            document.getElementById("v3Button");
 
-                <div class="info-card">
+        const v1v2Module =
+            document.getElementById("v1v2Module");
 
-                    <ul>
+        const v3Module =
+            document.getElementById("v3Module");
 
-                        <li>
-                            NASA telemetry channels can contain both point anomalies
-                            and contextual anomalies.
-                        </li>
+        const apiStatus =
+            document.getElementById("apiStatus");
 
-                        <li>
-                            Model performance varies across telemetry channels.
-                        </li>
 
-                        <li>
-                            Threshold and persistence values are calibrated from
-                            validation experiments.
-                        </li>
+        v1v2Button.onclick = function() {
 
-                        <li>
-                            Detection does not imply a confirmed physical spacecraft
-                            component failure.
-                        </li>
+            v1v2Module.style.display = "block";
+            v3Module.style.display = "none";
 
-                    </ul>
+        };
 
-                </div>
 
-            </div>
+        v3Button.onclick = function() {
 
-        </section>
+            v1v2Module.style.display = "none";
+            v3Module.style.display = "block";
 
-    </main>
+        };
 
-</div>
 
-<script>
-
-    const API_BASE = "";
-
-    function showModule(module) {
-
-        const v1v2 = document.getElementById("v1v2Module");
-        const v3 = document.getElementById("v3Module");
-
-        const v1v2Button = document.getElementById("v1v2Button");
-        const v3Button = document.getElementById("v3Button");
-
-        if (module === "v1v2") {
-
-            v1v2.style.display = "block";
-            v3.style.display = "none";
-
-            v1v2Button.classList.add("active");
-            v3Button.classList.remove("active");
-
-        } else {
-
-            v1v2.style.display = "none";
-            v3.style.display = "block";
-
-            v1v2Button.classList.remove("active");
-            v3Button.classList.add("active");
-        }
-    }
-
-    async function checkAPIHealth() {
-
-        const statusElement = document.getElementById("apiStatus");
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/api/health`
-            );
-
-            if (!response.ok) {
-                throw new Error("API returned an error.");
-            }
-
-            const data = await response.json();
-
-            statusElement.textContent = "🟢 API Online";
-
-            statusElement.classList.remove("api-offline");
-            statusElement.classList.add("api-online");
-
-            populateChannels(data.channels);
-
-        } catch (error) {
-
-            statusElement.textContent = "🔴 API Offline";
-
-            statusElement.classList.remove("api-online");
-            statusElement.classList.add("api-offline");
-
-            console.error("API health check failed:", error);
-        }
-    }
-
-    function populateChannels(channels) {
-
-        const select = document.getElementById("channelSelect");
-
-        select.innerHTML = "";
-
-        channels.forEach(channel => {
-
-            const option = document.createElement("option");
-
-            option.value = channel;
-            option.textContent = channel;
-
-            select.appendChild(option);
-        });
-    }
-
-    async function runReliabilitySimulation() {
-
-        const button = document.getElementById("reliabilityButton");
-        const loading = document.getElementById("reliabilityLoading");
-        const errorBox = document.getElementById("reliabilityError");
-        const results = document.getElementById("reliabilityResults");
-
-        const n = Number(
-            document.getElementById("requestsInput").value
-        );
-
-        const p = Number(
-            document.getElementById("probabilityInput").value
-        );
-
-        errorBox.innerHTML = "";
-        results.style.display = "none";
-
-        button.disabled = true;
-        loading.classList.add("show");
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/api/reliability`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        n: n,
-                        p: p
-                    })
-                }
-            );
-
-            const text = await response.text();
-
-            let data;
+        async function checkAPI() {
 
             try {
-                data = JSON.parse(text);
-            } catch {
-                throw new Error(
-                    "The API returned something that was not JSON."
-                );
-            }
 
-            if (!response.ok) {
+                const response =
+                    await fetch("/api/health");
 
-                throw new Error(
-                    data.detail || "Reliability API request failed."
-                );
-            }
 
-            displayReliabilityResults(data);
 
-        } catch (error) {
+                const data =
+                    await response.json();
 
-            errorBox.innerHTML = `
-                <div class="status error">
-                    ${escapeHTML(error.message)}
-                </div>
-            `;
-
-            console.error(error);
-
-        } finally {
-
-            button.disabled = false;
-            loading.classList.remove("show");
-        }
-    }
-
-    function displayReliabilityResults(data) {
-
-        document.getElementById("reliabilityResults").style.display = "block";
-
-        document.getElementById("expectedFailures").textContent =
-            formatNumber(data.expected_failures);
-
-        document.getElementById("observedFailures").textContent =
-            formatNumber(data.observed_failures);
-
-        document.getElementById("failureRate").textContent =
-            formatPercent(data.failure_rate);
-
-        document.getElementById("simulationAccuracy").textContent =
-            formatPercent(data.accuracy);
-
-        const difference =
-            Number(data.observed_failures) -
-            Number(data.expected_failures);
-
-        let assessment;
-
-        if (difference > 0) {
-
-            assessment = `
-                The observed number of failures is
-                <strong>${formatNumber(Math.abs(difference))}</strong>
-                above the expected value.
-                This indicates behavior that is higher than the
-                baseline simulated expectation.
-            `;
-
-        } else if (difference < 0) {
-
-            assessment = `
-                The observed number of failures is
-                <strong>${formatNumber(Math.abs(difference))}</strong>
-                below the expected value.
-                The simulated system is therefore operating below
-                the expected failure count.
-            `;
-
-        } else {
-
-            assessment = `
-                The observed number of failures matches the expected
-                value from the probabilistic model.
-            `;
-        }
-
-        document.getElementById("statisticalAssessment").innerHTML =
-            assessment;
-
-        displayConfusionMatrix(data.matrix);
-
-        document.getElementById("attributionPerformance").innerHTML = `
-            <strong>Attribution accuracy:</strong>
-            ${formatPercent(data.confusion_matrix_accuracy)}
-            <br><br>
-            <strong>Metric:</strong>
-            ${escapeHTML(String(data.metric_name || "Bayesian attribution"))}
-            <br>
-            <strong>Metric value:</strong>
-            ${formatNumber(data.metric_value)}
-        `;
-
-        document.getElementById("simulationDetails").innerHTML = `
-            <strong>Requests:</strong>
-            ${formatNumber(
-                document.getElementById("requestsInput").value
-            )}
-            <br>
-            <strong>Failure probability:</strong>
-            ${formatNumber(
-                document.getElementById("probabilityInput").value
-            )}
-            <br>
-            <strong>Expected failures:</strong>
-            ${formatNumber(data.expected_failures)}
-            <br>
-            <strong>Observed failures:</strong>
-            ${formatNumber(data.observed_failures)}
-        `;
-
-        document.getElementById("analysisSummary").innerHTML = `
-            <strong>System status:</strong>
-            ${escapeHTML(String(data.status || "Analysis completed."))}
-            <br><br>
-            V1 establishes whether the observed failure count is
-            consistent with the probabilistic baseline.
-            V2 then uses Bayesian reasoning to attribute failures
-            to possible causes.
-        `;
-
-        drawFailureChart(
-            data.expected_failures,
-            data.observed_failures
-        );
-    }
-
-    function displayConfusionMatrix(matrix) {
-
-        if (!matrix || matrix.length !== 3) {
-
-            document.getElementById("confusionMatrix").innerHTML =
-                `<div class="info-card">
-                    Confusion matrix data unavailable.
-                </div>`;
-
-            return;
-        }
-
-        document.getElementById("confusionMatrix").innerHTML = `
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th></th>
-                        <th>Database</th>
-                        <th>Network</th>
-                        <th>Server</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <th>Database</th>
-                        <td>${formatNumber(matrix[0][0])}</td>
-                        <td>${formatNumber(matrix[0][1])}</td>
-                        <td>${formatNumber(matrix[0][2])}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Network</th>
-                        <td>${formatNumber(matrix[1][0])}</td>
-                        <td>${formatNumber(matrix[1][1])}</td>
-                        <td>${formatNumber(matrix[1][2])}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Server</th>
-                        <td>${formatNumber(matrix[2][0])}</td>
-                        <td>${formatNumber(matrix[2][1])}</td>
-                        <td>${formatNumber(matrix[2][2])}</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-    function drawFailureChart(expected, observed) {
-
-        const canvas = document.getElementById("failureChart");
-
-        const ctx = canvas.getContext("2d");
-
-        const width = canvas.width;
-        const height = canvas.height;
-
-        ctx.clearRect(0, 0, width, height);
-
-        const maxValue =
-            Math.max(Number(expected), Number(observed), 1);
-
-        const chartHeight = height - 70;
-        const barWidth = 100;
-
-        const expectedHeight =
-            (Number(expected) / maxValue) * chartHeight;
-
-        const observedHeight =
-            (Number(observed) / maxValue) * chartHeight;
-
-        ctx.strokeStyle = "#31506b";
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-
-        ctx.moveTo(60, height - 40);
-        ctx.lineTo(width - 40, height - 40);
-
-        ctx.stroke();
-
-        ctx.fillStyle = "#4aa3df";
-
-        ctx.fillRect(
-            width * 0.28,
-            height - 40 - expectedHeight,
-            barWidth,
-            expectedHeight
-        );
-
-        ctx.fillStyle = "#ef7c7c";
-
-        ctx.fillRect(
-            width * 0.60,
-            height - 40 - observedHeight,
-            barWidth,
-            observedHeight
-        );
-
-        ctx.fillStyle = "#dbe8f5";
-        ctx.font = "14px Arial";
-        ctx.textAlign = "center";
-
-        ctx.fillText(
-            "Expected",
-            width * 0.28 + barWidth / 2,
-            height - 15
-        );
-
-        ctx.fillText(
-            "Observed",
-            width * 0.60 + barWidth / 2,
-            height - 15
-        );
-
-        ctx.fillText(
-            formatNumber(expected),
-            width * 0.28 + barWidth / 2,
-            height - 50 - expectedHeight
-        );
-
-        ctx.fillText(
-            formatNumber(observed),
-            width * 0.60 + barWidth / 2,
-            height - 50 - observedHeight
-        );
-    }
-
-    async function runTelemetryAnalysis() {
-
-        const button = document.getElementById("telemetryButton");
-        const loading = document.getElementById("telemetryLoading");
-        const errorBox = document.getElementById("telemetryError");
-        const results = document.getElementById("telemetryResults");
-
-        const channel =
-            document.getElementById("channelSelect").value;
-
-        const model =
-            document.getElementById("modelSelect").value;
-
-        errorBox.innerHTML = "";
-        results.style.display = "none";
-
-        button.disabled = true;
-        loading.classList.add("show");
-
-        try {
-
-            const response = await fetch(
-                `${API_BASE}/api/telemetry`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        channel: channel,
-                        model: model
-                    })
+                if (!response.ok) {
+                    throw new Error("API error");
                 }
-            );
 
-            const text = await response.text();
+                apiStatus.textContent =
+                    "🟢 API Online";
 
-            let data;
+                apiStatus.className =
+                    "online";
+
+                loadChannels(data.channels);
+                loadModels(data.models);
+
+            } catch (error) {
+
+                apiStatus.textContent =
+                    "🔴 API Offline";
+
+
+                apiStatus.className =
+                    "offline";
+
+            }
+
+        }
+
+
+        function loadChannels(channels) {
+
+            const select =
+                document.getElementById("channel");
+
+            select.innerHTML = "";
+
+            channels.forEach(function(item) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = item;
+                option.textContent = item;
+
+                select.appendChild(option);
+
+            });
+
+        }
+
+
+        function loadModels(models) {
+
+            const select =
+                document.getElementById("model");
+
+            select.innerHTML = "";
+
+            models.forEach(function(item) {
+
+
+
+                const option =
+                    document.createElement("option");
+
+                option.value = item;
+                option.textContent = item;
+
+                select.appendChild(option);
+
+            });
+
+        }
+
+
+        document.getElementById(
+            "reliabilityButton"
+        ).onclick = async function() {
+
+            const n =
+                Number(
+                    document.getElementById("requests").value
+                );
+
+            const p =
+                Number(
+                    document.getElementById("probability").value
+                );
+
+            const message =
+                document.getElementById("reliabilityMessage");
+
+            message.textContent =
+                "Running simulation...";
+
+            this.disabled = true;
 
             try {
-                data = JSON.parse(text);
-            } catch {
-                throw new Error(
-                    "The telemetry API returned something that was not JSON."
-                );
+
+                const response =
+                    await fetch(
+                        "/api/reliability",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body: JSON.stringify({
+                                n: n,
+                                p: p
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Simulation failed"
+                    );
+                }
+
+                document.getElementById(
+                    "expectedFailures"
+                ).textContent =
+                    data.expected_failures;
+
+
+                document.getElementById(
+                    "observedFailures"
+                ).textContent =
+                    data.observed_failures;
+
+                document.getElementById(
+                    "failureRate"
+                ).textContent =
+                    data.failure_rate;
+
+                document.getElementById(
+                    "simulationAccuracy"
+                ).textContent =
+                    data.accuracy;
+
+                if (data.matrix) {
+
+                    document.getElementById(
+                        "truePositive"
+                    ).textContent =
+                        "True Positive: " +
+                        data.matrix.true_positive;
+
+                    document.getElementById(
+                        "falsePositive"
+                    ).textContent =
+                        "False Positive: " +
+                        data.matrix.false_positive;
+
+                    document.getElementById(
+                        "trueNegative"
+                    ).textContent =
+                        "True Negative: " +
+                        data.matrix.true_negative;
+
+                    document.getElementById(
+                        "falseNegative"
+                    ).textContent =
+                        "False Negative: " +
+                        data.matrix.false_negative;
+
+                }
+
+                document.getElementById(
+                    "simulationDetails"
+                ).innerHTML =
+                    "Requests: " + n +
+                    "<br>" +
+                    "Failure probability: " + p +
+                    "<br>" +
+                    "Expected failures: " +
+                    data.expected_failures +
+                    "<br>" +
+                    "Observed failures: " +
+                    data.observed_failures;
+
+                document.getElementById(
+                    "statisticalAssessment"
+                ).textContent =
+                    "Simulation completed successfully.";
+
+                message.textContent =
+                    "Simulation completed.";
+
+            } catch (error) {
+
+                message.textContent =
+                    error.message;
+
             }
 
-            if (!response.ok) {
+            this.disabled = false;
 
-                throw new Error(
-                    data.detail || "Telemetry API request failed."
-                );
+        };
+
+
+        document.getElementById(
+            "telemetryButton"
+        ).onclick = async function() {
+
+            const channel =
+                document.getElementById("channel").value;
+
+            const model =
+                document.getElementById("model").value;
+
+            const message =
+                document.getElementById("telemetryMessage");
+
+            message.textContent =
+                "Running telemetry analysis...";
+
+            this.disabled = true;
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/telemetry",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body: JSON.stringify({
+                                channel: channel,
+                                model: model
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Telemetry analysis failed"
+                    );
+                }
+
+                document.getElementById(
+                    "precision"
+                ).textContent =
+                    data.precision;
+
+                document.getElementById(
+                    "recall"
+                ).textContent =
+                    data.recall;
+
+                document.getElementById(
+                    "f1"
+                ).textContent =
+                    data.f1;
+
+                document.getElementById(
+                    "anomalies"
+                ).textContent =
+                    Array.isArray(data.anomalies_indices)
+                        ? data.anomalies_indices.length
+                        : 0;
+
+                document.getElementById(
+                    "threshold"
+                ).textContent =
+                    data.threshold;
+
+                document.getElementById(
+                    "persistence"
+                ).textContent =
+                    data.persistence || "Calibrated";
+
+                document.getElementById(
+                    "telemetryDetails"
+                ).innerHTML =
+                    "Channel: " + data.channel +
+                    "<br>" +
+                    "Model: " + data.model;
+
+                if (data.figure_png_base64) {
+
+                    const figure =
+                        document.getElementById(
+                            "telemetryFigure"
+                        );
+
+                    figure.src =
+                        "data:image/png;base64," +
+
+                        data.figure_png_base64;
+
+                    figure.style.display =
+                        "block";
+
+                }
+
+                message.textContent =
+                    "Telemetry analysis completed.";
+
+            } catch (error) {
+
+                message.textContent =
+                    error.message;
+
             }
 
-            displayTelemetryResults(data);
+            this.disabled = false;
 
-        } catch (error) {
+        };
 
-            errorBox.innerHTML = `
-                <div class="status error">
-                    ${escapeHTML(error.message)}
-                </div>
-            `;
 
-            console.error(error);
+        checkAPI();
 
-        } finally {
-
-            button.disabled = false;
-            loading.classList.remove("show");
-        }
-    }
-
-    function displayTelemetryResults(data) {
-
-        document.getElementById("telemetryResults").style.display = "block";
-
-        document.getElementById("precisionValue").textContent =
-            formatPercent(data.precision);
-
-        document.getElementById("recallValue").textContent =
-            formatPercent(data.recall);
-
-        document.getElementById("f1Value").textContent =
-            formatPercent(data.f1);
-
-        document.getElementById("anomaliesCount").textContent =
-            formatNumber(
-                Array.isArray(data.anomalies_indices)
-                    ? data.anomalies_indices.length
-                    : 0
-            );
-
-        document.getElementById("thresholdValue").textContent =
-            formatNumber(data.threshold);
-
-        document.getElementById("persistenceValue").textContent =
-            data.persistence || "Calibrated";
-
-        const figure = document.getElementById("telemetryFigure");
-
-        if (data.figure_png_base64) {
-
-            figure.src =
-                "data:image/png;base64," +
-                data.figure_png_base64;
-
-            figure.style.display = "block";
-
-        } else {
-
-            figure.style.display = "none";
-        }
-
-        document.getElementById("detectionExplanation").innerHTML = `
-
-            The selected model analyzed NASA telemetry channel
-            <strong>${escapeHTML(String(data.channel))}</strong>.
-
-            <br><br>
-
-            <strong>Model:</strong>
-            ${escapeHTML(String(data.model))}
-
-            <br><br>
-
-            The system compares model prediction error against a
-            calibrated anomaly threshold and applies persistence
-            logic where applicable to reduce isolated false alarms.
-        `;
-
-        const anomalyIndices =
-            Array.isArray(data.anomalies_indices)
-                ? data.anomalies_indices
-                : [];
-
-        document.getElementById("detectionDetails").innerHTML = `
-
-            <strong>Channel:</strong>
-            ${escapeHTML(String(data.channel))}
-            <br>
-
-            <strong>Model:</strong>
-            ${escapeHTML(String(data.model))}
-            <br>
-
-            <strong>Threshold:</strong>
-            ${formatNumber(data.threshold)}
-            <br>
-
-            <strong>Anomaly points detected:</strong>
-            ${formatNumber(anomalyIndices.length)}
-            <br>
-
-            <strong>Persistence:</strong>
-            ${escapeHTML(String(data.persistence || "Calibrated"))}
-        `;
-
-        document.getElementById("performanceTable").innerHTML = `
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>Precision</td>
-                        <td>${formatPercent(data.precision)}</td>
-                    </tr>
-
-                    <tr>
-                        <td>Recall</td>
-                        <td>${formatPercent(data.recall)}</td>
-                    </tr>
-
-                    <tr>
-                        <td>F1 Score</td>
-                        <td>${formatPercent(data.f1)}</td>
-                    </tr>
-
-                    <tr>
-                        <td>Anomalies flagged</td>
-                        <td>${formatNumber(anomalyIndices.length)}</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-        `;
-
-        document.getElementById("telemetrySummary").innerHTML = `
-
-            <strong>Channel:</strong>
-            ${escapeHTML(String(data.channel))}
-            <br>
-
-            <strong>Detection model:</strong>
-            ${escapeHTML(String(data.model))}
-            <br><br>
-
-            The model produced anomaly predictions for the selected
-            spacecraft telemetry channel. Precision, recall, and F1
-            summarize the agreement between detected anomalies and
-            the labeled NASA anomaly zones used for evaluation.
-        `;
-    }
-
-    function formatNumber(value) {
-
-        const number = Number(value);
-
-        if (!Number.isFinite(number)) {
-            return "—";
-        }
-
-        return number.toLocaleString(
-            undefined,
-            {
-                maximumFractionDigits: 4
-            }
-        );
-    }
-
-    function formatPercent(value) {
-
-        const number = Number(value);
-
-        if (!Number.isFinite(number)) {
-            return "—";
-        }
-
-        if (Math.abs(number) <= 1) {
-
-            return (
-                (number * 100).toFixed(2) +
-                "%"
-            );
-        }
-
-        return number.toFixed(2) + "%";
-    }
-
-    function escapeHTML(value) {
-
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    checkAPIHealth();
-
-</script>
+    </script>
 
 </body>
+
 </html>
