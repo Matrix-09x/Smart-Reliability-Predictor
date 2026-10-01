@@ -20,23 +20,13 @@ I made this project as part of StarDance. My main goal was to build a system tha
 ### V1 - Statistical Monitoring
 
 The first version was a failure simulation.
-
 I first tried using Z-scores to find unusual failure counts. It did not work well for smaller sample sizes, so I changed it to a Poisson distribution.
-
-The main idea is:
-
-$$\lambda = n \times p$$
-
 V1 checks if the observed number of failures is unusual compared to the expected number.
 
 ### V2 - Finding the Cause
 
 After V1, I wanted to find out why a failure might be happening.
-
-I used Bayes' Theorem:
-
-$$P(C\vert{}E) = \frac{P(E\vert{}C) \cdot P(C)}{P(E)}$$
-
+I used Bayes Theorem:
 The system checks three possible causes:
 
 - Database overload
@@ -49,11 +39,8 @@ I tested it with a 10,000-run simulation and got an average classification accur
 
 For V3, I moved from simulated data to real NASA telemetry data from the **SMAP and MSL anomaly datasets**.
 The dataset contain many channels and they were classified into 2 types - point and contextual .
-
 The models use the previous 10 readings to predict the next value.
-
 If the actual value is far from the prediction, it can be marked as an anomaly.
-
 I also added a persistence rule so that one random spike does not immediately create an alert. The error needs to stay high across multiple readings.
 
 ## Models Tested
@@ -63,12 +50,6 @@ I tested three models:
 - Linear Regression - Used as a simple baseline.
 - Random Forest - Used to find non-linear patterns.
 - LSTM - Used for the sequential time-series data.
-
-The LSTM structure is:
-
-`10 inputs` $\rightarrow$ `LSTM (50 units)` $\rightarrow$ `Dense layer` $\rightarrow$ `Next value`
-
-## Architecture and Deployment
 
 ### Tech Stack
 
@@ -85,7 +66,7 @@ The LSTM structure is:
 
 ### How It Works
 
-1. Models are trained using `pretrain.py`.
+1. Models are trained using pretrain.py.
 2. The trained models and thresholds are saved.
 3. FastAPI loads the saved models.
 4. The dashboard sends requests to the API.
@@ -96,40 +77,27 @@ Training and prediction are kept separate so the deployed app does not need to t
 ## Running Locally
 
 Install the dependencies:
-
-
 pip install -r requirements.txt
 
-
 Train the models:
-
-
 python pretrain.py
 
 
 Start the server:
-
-
 python -m uvicorn api.index:app --port 8000
 
 
 Then open:
 [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-## Limitations
 
-- Anomalies are not Hardware Failures: An anomaly only means that the telemetry value is different from what the model expected. It does not automatically mean that a physical part has failed.
-- Single Channel Focus: The current system mainly looks at one telemetry channel at a time. Some spacecraft problems may need multiple channels to be checked together.
 
 ## AI Usage
-
 I used AI mainly as a tutor during the project. It helped me understand some probability, statistics, and machine learning concepts, as well as programming and documentation questions. I tested the code myself, fixed errors, and made changes while building the project.
 
 
 
 ### Final Note
-
 This project started as a way to practice probability and statistics and grew into a project about anomaly detection, time-series data, machine learning, and deployment.
-
 Built by Touheed (Matrix) as part of my journey toward becoming an AI engineer.
 
