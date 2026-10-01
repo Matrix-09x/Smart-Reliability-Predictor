@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 
 
-
 <html>
 
 <head>
-
     <title>NASA Spacecraft Reliability Engine</title>
 
-
     <style>
-
         body {
             margin: 0;
             background: #07111f;
@@ -18,11 +14,8 @@
             font-family: Arial;
         }
 
-
-
         .dashboard {
             display: flex;
-
             min-height: 100vh;
         }
 
@@ -48,7 +41,6 @@
             margin-top: 10px;
             background: #101c2e;
             color: white;
-
             border: 1px solid #263b52;
             cursor: pointer;
             text-align: left;
@@ -72,7 +64,6 @@
             background: #0d1a2b;
             border: 1px solid #20344a;
             padding: 20px;
-
             margin-top: 25px;
             border-radius: 8px;
         }
@@ -92,7 +83,6 @@
             padding: 11px;
             box-sizing: border-box;
             background: #101c2e;
-
             color: white;
             border: 1px solid #2a4058;
         }
@@ -116,6 +106,8 @@
 
         .card-row {
             display: flex;
+
+
             gap: 15px;
         }
 
@@ -191,7 +183,6 @@
         }
 
         @media (max-width: 800px) {
-
             .dashboard {
                 display: block;
             }
@@ -207,12 +198,13 @@
             .card-row {
                 display: block;
             }
-
         }
-
     </style>
 
+
 </head>
+
+
 
 <body>
 
@@ -221,8 +213,6 @@
         <div class="sidebar">
 
             <h2>🚀 Mission Control</h2>
-
-            
 
             <p>Choose module</p>
 
@@ -242,7 +232,6 @@
 
         </div>
 
-
         <div class="main">
 
             <h1>NASA Spacecraft Reliability Engine</h1>
@@ -250,7 +239,6 @@
             <p>
                 This system analyzes spacecraft reliability and telemetry anomalies.
             </p>
-
 
             <section id="v1v2Module">
 
@@ -264,7 +252,11 @@
                             Number of Requests
                         </label>
 
-                        <input id="requests" type="number" value="10000">
+                        <input
+                            id="requests"
+                            type="number"
+                            value="10000"
+                        >
 
                     </div>
 
@@ -274,10 +266,12 @@
                             Failure Probability
                         </label>
 
-                        <input id="probability"
-                               type="number"
-                               value="0.9"
-                               step="0.01">
+                        <input
+                            id="probability"
+                            type="number"
+                            value="0.9"
+                            step="0.01"
+                        >
 
                     </div>
 
@@ -288,7 +282,6 @@
                     <p id="reliabilityMessage" class="message"></p>
 
                 </div>
-
 
                 <div class="card-row">
 
@@ -305,10 +298,10 @@
                     <div class="card">
                         <h2>Failure Rate</h2>
                         <p id="failureRate" class="value">--</p>
+
                     </div>
 
                 </div>
-
 
                 <div class="card-row">
 
@@ -323,7 +316,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="card">
 
@@ -340,7 +332,6 @@
 
                 </div>
 
-
                 <div class="card">
 
                     <h2>Confusion Matrix</h2>
@@ -350,7 +341,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="card">
 
@@ -362,7 +352,6 @@
 
                 </div>
 
-
                 <div class="card">
 
                     <h2>Simulation Details</h2>
@@ -373,7 +362,6 @@
 
                 </div>
 
-
                 <div class="card">
 
                     <h2>Analysis Summary</h2>
@@ -383,7 +371,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="card">
 
@@ -411,7 +398,6 @@
 
             </section>
 
-
             <section id="v3Module">
 
                 <div class="configuration">
@@ -430,7 +416,6 @@
 
                     </div>
 
-
                     <div class="form-group">
 
                         <label for="model">
@@ -443,7 +428,6 @@
 
                     </div>
 
-
                     <button class="run-button" id="telemetryButton">
                         RUN TELEMETRY ANALYSIS
                     </button>
@@ -451,7 +435,6 @@
                     <p id="telemetryMessage" class="message"></p>
 
                 </div>
-
 
                 <div class="card-row">
 
@@ -472,7 +455,6 @@
 
                 </div>
 
-
                 <div class="card-row">
 
                     <div class="card">
@@ -488,10 +470,11 @@
                     <div class="card">
                         <h2>Persistence</h2>
                         <p id="persistence" class="value">--</p>
+
+
                     </div>
 
                 </div>
-
 
                 <div class="card">
 
@@ -501,10 +484,12 @@
                         --
                     </p>
 
-                    <img id="telemetryFigure" style="display:none;">
+                    <img
+                        id="telemetryFigure"
+                        style="display:none;"
+                    >
 
                 </div>
-
 
                 <div class="card">
 
@@ -515,7 +500,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="card">
 
@@ -537,7 +521,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="card">
 
@@ -575,7 +558,6 @@
 
     </div>
 
-
     <script>
 
         const v1v2Button = document.getElementById("v1v2Button");
@@ -584,18 +566,15 @@
         const v3Module = document.getElementById("v3Module");
         const apiStatus = document.getElementById("apiStatus");
 
-
         v1v2Button.onclick = function() {
             v1v2Module.style.display = "block";
             v3Module.style.display = "none";
         };
 
-
         v3Button.onclick = function() {
             v1v2Module.style.display = "none";
             v3Module.style.display = "block";
         };
-
 
         async function checkAPI() {
 
@@ -620,13 +599,12 @@
                 apiStatus.className = "offline";
 
             }
-
         }
-
 
         function loadChannels(channels) {
 
             const channel = document.getElementById("channel");
+
             channel.innerHTML = "";
 
             channels.forEach(function(item) {
@@ -639,13 +617,12 @@
                 channel.appendChild(option);
 
             });
-
         }
-
 
         function loadModels(models) {
 
             const model = document.getElementById("model");
+
             model.innerHTML = "";
 
             models.forEach(function(item) {
@@ -653,18 +630,20 @@
                 const option = document.createElement("option");
 
                 option.value = item;
+
+
                 option.textContent = item;
 
                 model.appendChild(option);
 
             });
-
         }
-
 
         function formatNumber(value) {
 
             const number = Number(value);
+
+
 
             if (!Number.isFinite(number)) {
                 return "—";
@@ -673,9 +652,7 @@
             return number.toLocaleString(undefined, {
                 maximumFractionDigits: 4
             });
-
         }
-
 
         function formatPercent(value) {
 
@@ -690,9 +667,7 @@
             }
 
             return number.toFixed(2) + "%";
-
         }
-
 
         document.getElementById("reliabilityButton").onclick =
             async function() {
@@ -709,19 +684,24 @@
                     document.getElementById("reliabilityMessage");
 
                 message.textContent = "Running simulation...";
-                this.disabled = true;
 
+                this.disabled = true;
 
                 try {
 
-                    const response = await fetch("/api/reliability", {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({
-                            n: requests,
-                            p: probability
-                        })
-                    });
+                    const response = await fetch(
+                        "/api/reliability",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                n: requests,
+                                p: probability
+                            })
+                        }
+                    );
 
                     const data = await response.json();
 
@@ -731,24 +711,29 @@
                         );
                     }
 
-
-                    document.getElementById("expectedFailures").textContent =
+                    document.getElementById(
+                        "expectedFailures"
+                    ).textContent =
                         formatNumber(data.expected_failures);
 
-                    document.getElementById("observedFailures").textContent =
+                    document.getElementById(
+                        "observedFailures"
+                    ).textContent =
                         formatNumber(data.observed_failures);
 
-                    document.getElementById("failureRate").textContent =
+                    document.getElementById(
+                        "failureRate"
+                    ).textContent =
                         formatPercent(data.failure_rate);
 
-                    document.getElementById("simulationAccuracy").textContent =
+                    document.getElementById(
+                        "simulationAccuracy"
+                    ).textContent =
                         formatPercent(data.accuracy);
-
 
                     const difference =
                         Number(data.observed_failures) -
                         Number(data.expected_failures);
-
 
                     if (difference > 0) {
 
@@ -770,18 +755,17 @@
                             "statisticalAssessment"
                         ).textContent =
                             "Observed failures match the expected value.";
-
                     }
 
-
                     displayConfusionMatrix(data.matrix);
-
 
                     document.getElementById(
                         "attributionPerformance"
                     ).innerHTML =
                         "Attribution accuracy: " +
-                        formatPercent(data.confusion_matrix_accuracy) +
+                        formatPercent(
+                            data.confusion_matrix_accuracy
+                        ) +
                         "<br><br>" +
                         "Metric: " +
                         (data.metric_name || "Bayesian attribution") +
@@ -790,19 +774,22 @@
                         formatNumber(data.metric_value);
 
 
+
+
                     document.getElementById(
                         "simulationDetails"
                     ).innerHTML =
-                        "Requests: " + requests +
+                        "Requests: " +
+                        requests +
                         "<br>" +
-                        "Failure probability: " + probability +
+                        "Failure probability: " +
+                        probability +
                         "<br>" +
                         "Expected failures: " +
                         data.expected_failures +
                         "<br>" +
                         "Observed failures: " +
                         data.observed_failures;
-
 
                     document.getElementById(
                         "analysisSummary"
@@ -813,7 +800,6 @@
                         "V2 uses Bayesian reasoning to estimate " +
                         "the possible failure cause.";
 
-
                     message.textContent =
                         "Simulation completed.";
 
@@ -823,17 +809,13 @@
 
                 }
 
-
                 this.disabled = false;
-
             };
-
 
         function displayConfusionMatrix(matrix) {
 
             const box =
                 document.getElementById("confusionMatrix");
-
 
             if (!matrix || matrix.length !== 3) {
 
@@ -841,8 +823,9 @@
                     "Confusion matrix data unavailable.";
 
                 return;
-
             }
+
+
 
 
             box.innerHTML =
@@ -876,9 +859,7 @@
                 "</tr>" +
 
                 "</table>";
-
         }
-
 
         document.getElementById("telemetryButton").onclick =
             async function() {
@@ -897,73 +878,99 @@
 
                 this.disabled = true;
 
-
                 try {
 
-                    const response = await fetch("/api/telemetry", {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({
-                            channel: channel,
-                            model: model
-                        })
-                    });
+                    const response = await fetch(
+                        "/api/telemetry",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                channel: channel,
+                                model: model
+                            })
+                        }
+                    );
 
                     const data = await response.json();
 
                     if (!response.ok) {
                         throw new Error(
-                            data.detail || "Telemetry analysis failed"
+                            data.detail ||
+                            "Telemetry analysis failed"
                         );
                     }
 
-
-                    document.getElementById("precision").textContent =
+                    document.getElementById(
+                        "precision"
+                    ).textContent =
                         formatPercent(data.precision);
 
-                    document.getElementById("recall").textContent =
+                    document.getElementById(
+                        "recall"
+                    ).textContent =
                         formatPercent(data.recall);
 
-                    document.getElementById("f1").textContent =
+                    document.getElementById(
+                        "f1"
+                    ).textContent =
                         formatPercent(data.f1);
 
+                    let anomalies = 0;
 
-                    const anomalies =
-                        Array.isArray(data.anomalies_indices)
-                            ? data.anomalies_indices.length
-                            : 0;
+                    if (Array.isArray(data.anomalies_indices)) {
+                        anomalies =
+                            data.anomalies_indices.length;
+                    }
 
+                    document.getElementById(
+                        "anomalies"
+                    ).textContent = anomalies;
 
-                    document.getElementById("anomalies").textContent =
-                        anomalies;
-
-                    document.getElementById("threshold").textContent =
+                    document.getElementById(
+                        "threshold"
+                    ).textContent =
                         formatNumber(data.threshold);
 
-                    document.getElementById("persistence").textContent =
+                    document.getElementById(
+                        "persistence"
+                    ).textContent =
                         data.persistence || "Calibrated";
 
+                    document.getElementById(
+                        "telemetryDetails"
+                    ).innerHTML =
+                        "Channel: " +
+                        data.channel +
+                        "<br>" +
+                        "Model: " +
+                        data.model;
 
-                    document.getElementById("telemetryDetails").innerHTML =
-                        "Channel: " + data.channel +
+                    document.getElementById(
+                        "detectionDetails"
+                    ).innerHTML =
+                        "Channel: " +
+                        data.channel +
                         "<br>" +
-                        "Model: " + data.model;
+                        "Model: " +
+                        data.model +
+                        "<br>" +
+                        "Threshold: " +
+                        formatNumber(data.threshold) +
 
-
-                    document.getElementById("detectionDetails").innerHTML =
-                        "Channel: " + data.channel +
+                        
                         "<br>" +
-                        "Model: " + data.model +
-                        "<br>" +
-                        "Threshold: " + formatNumber(data.threshold) +
-                        "<br>" +
-                        "Anomalies detected: " + anomalies +
+                        "Anomalies detected: " +
+                        anomalies +
                         "<br>" +
                         "Persistence: " +
                         (data.persistence || "Calibrated");
 
-
-                    document.getElementById("performanceTable").innerHTML =
+                    document.getElementById(
+                        "performanceTable"
+                    ).innerHTML =
                         "<table>" +
                         "<tr>" +
                         "<th>Metric</th>" +
@@ -972,28 +979,37 @@
 
                         "<tr>" +
                         "<td>Precision</td>" +
-                        "<td>" + formatPercent(data.precision) + "</td>" +
+                        "<td>" +
+                        formatPercent(data.precision) +
+                        "</td>" +
                         "</tr>" +
 
                         "<tr>" +
                         "<td>Recall</td>" +
-                        "<td>" + formatPercent(data.recall) + "</td>" +
+                        "<td>" +
+                        formatPercent(data.recall) +
+                        "</td>" +
                         "</tr>" +
 
                         "<tr>" +
                         "<td>F1 Score</td>" +
-                        "<td>" + formatPercent(data.f1) + "</td>" +
+                        "<td>" +
+                        formatPercent(data.f1) +
+                        "</td>" +
                         "</tr>" +
 
                         "<tr>" +
                         "<td>Anomalies</td>" +
-                        "<td>" + anomalies + "</td>" +
+                        "<td>" +
+                        anomalies +
+                        "</td>" +
                         "</tr>" +
 
                         "</table>";
 
-
-                    document.getElementById("telemetrySummary").innerHTML =
+                    document.getElementById(
+                        "telemetrySummary"
+                    ).innerHTML =
                         "The selected model analyzed the " +
                         data.channel +
                         " telemetry channel." +
@@ -1002,10 +1018,10 @@
                         "and the model performance using precision, " +
                         "recall and F1 score.";
 
-
                     const figure =
-                        document.getElementById("telemetryFigure");
-
+                        document.getElementById(
+                            "telemetryFigure"
+                        );
 
                     if (data.figure_png_base64) {
 
@@ -1018,29 +1034,32 @@
                     } else {
 
                         figure.style.display = "none";
-
                     }
-
 
                     message.textContent =
                         "Telemetry analysis completed.";
 
                 } catch (error) {
 
-                    message.textContent = error.message;
-
+                    message.textContent =
+                        error.message;
                 }
 
-
                 this.disabled = false;
-
             };
 
-
         checkAPI();
+
+
+
+
 
     </script>
 
 </body>
+
+
+
+
 
 </html>
