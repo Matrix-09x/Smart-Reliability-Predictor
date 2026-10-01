@@ -5,6 +5,7 @@ ml_env/
 
 rough.py
 
-models/
+
 .vercel
 .env*
+app.py

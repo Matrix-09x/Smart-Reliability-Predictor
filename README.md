@@ -2,7 +2,8 @@
 
 I started this project  when i was stuck in learning probability and statistics for ai . Like i wanted to implement what i learned  in real projects , that was more fun . So i builded this project that initially started as a simple faliure stimulation but later turned into an anomaly detection system and i literally used an real NASA dataset for it .
 
-# Dashbaord 
+# Dashboard 
+
 
 
 ## Live demo or url 
