@@ -18,15 +18,18 @@ def Proability_stimulator(n,p) :
          number = rng.random()
 
          if number < p  : 
-            outcome = 0 # 0  represent failure broo as 0 is 0 and its failure
+            outcome = 0 
             result_list.append(outcome)
 
          else :
 
-            outcome = 1 # 1 represent success like no particualar reason just prob and stat things
+            outcome = 1 
             result_list.append(outcome)
 
       return result_list
+
+   # result_l = stimualtion_request(n,p)
+   # print(f'result list :'result_l)
 
    result = stimualtion_request(n,p)
 
@@ -41,13 +44,17 @@ def Proability_stimulator(n,p) :
 
    evidences = []
 
+   # print(evidence)
+   # print(evidence[0])
+   # print(evidence[5])
+
 
 
 
 
    for i in failure_cause :
       if i  == 'Db' :
-         db_num = int(rng.integers(70,101))
+         db_num =  int(rng.integers(70,101))
          n_num = int(rng.integers(10,131))
          S_num = int(rng.integers(30,76))
          evidences.append({'db load' : db_num , 'network latency' : n_num , 'server load' : S_num })
@@ -63,12 +70,6 @@ def Proability_stimulator(n,p) :
          n_num = int(rng.integers(10,131))
          S_num = int(rng.integers(70,101))
          evidences.append({'db load' : db_num , 'network latency' : n_num , 'server load' : S_num })
-
-
-
-
-      
-
 
 
 
@@ -166,7 +167,7 @@ def Proability_stimulator(n,p) :
    Network_Db_incorrected = 0
    Network_Server_incorrected = 0
    correct_prediction = 0 
-
+ 
 
    for i, cause in enumerate(failure_cause) :
       if cause == Causes_list[i] :
@@ -202,7 +203,7 @@ def Proability_stimulator(n,p) :
 
             elif Causes_list[i] == 'Server' :
                Network_Server_incorrected += 1
-
+  
 
    Accuracy = (correct_prediction /len(failure_cause)) * 100 
 
@@ -232,9 +233,9 @@ def Proability_stimulator(n,p) :
 
    if n > 0 and p > 0 :
 
-      # print('SYSTEM REPORT')
-      # print(f'Request | {n}')
-      # print(f'Failure Proabability | {p}')
+
+      # print(f'Request = {n}')
+      # print(f'Failure Proabability = {p}')
 
 
 
@@ -287,6 +288,10 @@ def Proability_stimulator(n,p) :
 
 
    
+      
+
+
+
 
   
 
@@ -294,3 +299,4 @@ def Proability_stimulator(n,p) :
 
 
    
+

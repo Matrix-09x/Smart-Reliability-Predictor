@@ -3,6 +3,7 @@ import numpy  as np
 import pandas as pd 
 import math as m  
 import ast
+
 import tensorflow   as tf
 
 import os 
@@ -25,7 +26,7 @@ from sklearn.metrics import r2_score
 
 anomalies = pd.read_csv('labeled_anomalies.csv').reset_index(drop=True)
 anomalies = anomalies.set_index('chan_id')
-
+# print(anomalies[0:12])
 
 def get_anomaly_zone(channel) :
     rows = anomalies.loc[channel, 'anomaly_sequences']
@@ -40,6 +41,11 @@ def get_anomaly_zone(channel) :
         return zones
 
     return ast.literal_eval(rows)
+
+# anomaly = get_anomaly_zone('P1')
+# anomaly2 = get_anomaly_zone('F2')
+# print(anomaly , anomaly2)
+
 
 
 
@@ -77,6 +83,7 @@ def Lstm_channel(channel,mode = "inference") :
     input_lstm  = x_train.reshape(x_train.shape[0] , x_train.shape[1],1)
 
     y_train = np.array(y_train)
+    # print(np.shape(input_lstm))
 
     Testing  =  np.load(f'data/data/test/{channel}.npy')
     testing_signal =  Testing[:,0]
