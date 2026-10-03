@@ -42,6 +42,7 @@ First go on the live dashbord . There are 2 section  -
 # Credits 
 * Stack overflow for documentation
 * Official NASA SMAP and MSL  Dataset for  research and stimulation
+* Vercel for deployment
 
 # Reason behind making this project
 I was studying Probaility and statistics concepts for a long time . I wanted to implement it and see the real results . I also watched Spiderman
