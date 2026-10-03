@@ -3,7 +3,11 @@
 I started this project  when i was stuck in learning probability and statistics for ai . Like i wanted to implement what i learned  in real projects , that was more fun . So i builded this project that initially started as a simple faliure stimulation but later turned into an anomaly detection system and i literally used an real NASA dataset for it .
 
 # Dashboard 
+<<<<<<< HEAD
 
+=======
+![Dashboard for the project] (https://github.com/Matrix-09x/Smart-Reliability-Predictor/blob/1d7bd21e5b0d5b3e0fbbccfeedbbaf65066d6b6a/Screenshot%202026-10-01%20195046.png)
+>>>>>>> 45d53ba4aa0ae26b8765487c01ab0c5c247bd04b
 
 
 ## Live demo or url 
