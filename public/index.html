@@ -7,38 +7,38 @@
     <title>NASA Spacecraft Reliability Engine</title>
 
     <style>
-        body {margin: 0;background: #eee; color: #222; font-family: Arial;}
+        body {margin: 0;background: #1e1e1e; color: #e4e1da; font-family: Arial;}
         .dashboard {display: flex; min-height: 100vh;}
-        .sidebar {width: 230px;background: #252525;color:white; padding: 20px;box-sizing: border-box;}
-        .sidebar h2 {margin-top: 0;}
-        .sidebar p {color: #cccccc;}
-        .module-button {width: 100%; padding: 12px; margin-top: 10px; background: #333333; color: white;border: 1px solid #555555;cursor: pointer;text-align: left;}
-        .module-button:hover {background: #444444;}
+        .sidebar {width: 230px;background: #2a2a2a;color: #e4e1da; padding: 20px;box-sizing: border-box;border-right : 1px solid #444444;}
+        .sidebar h2 {margin-top: 0;color: #e0a030;}
+        .sidebar p {color: #9a968c;}
+        .module-button {width: 100%; padding: 12px; margin-top: 10px; background: #1e1e1e; color: #e4e1da;border: 1px solid #444444;cursor: pointer;text-align: left;}
+        .module-button:hover {background: #e0a030;color: #1e1e1e;}
         .main {flex: 1;padding: 30px;max-width: 1100px;}
-        .main > p {color: #555;}
+        .main > p {color: #9a968c;}
 
-        .configuration {background: white;border: 1px solid #cccccc;padding: 20px;margin-top: 25px;border-radius: 8px;}
+        .configuration {background: #2a2a2a;border: 1px solid #444444;padding: 20px;margin-top: 25px;border-radius: 2px;}
         .form-group {margin-top: 18px;}
-        label {display: block;margin-bottom: 7px;}
-        input,select {width: 100%;padding: 11px; box-sizing: border-box; background: #aaa;color: #222; border: 1px solid #aaa;}
+        label {display: block;margin-bottom: 7px;color : #e4e1da;}
+        input,select {width: 100%;padding: 11px; box-sizing: border-box; background: #1e1e1e;color: #e4e1da; border: 1px solid #444444;}
 
-        .run-button {margin-top: 20px; padding: 11px 18px;background: #333;color: white;border: none ;cursor: pointer;}
-        .run-button:hover {background: #555;}
+        .run-button {margin-top: 20px; padding: 11px 18px;background: #e0a030;color: #1e1e1e;border: none ;cursor: pointer;}
+        .run-button:hover {background: #c88d25;}
         .run-button:disabled {opacity: 0.5;}
 
         .card-row {display: flex;gap: 15px;}
-        .card {flex: 1;background: white;border: 1px solid #cccccc; border-radius: 8px;padding: 20px;margin-top: 20px;}
-        .card h2 {margin-top: 0;font-size: 18px;}
-        .value {font-size: 25px}
-        .details {color: #555;line-height: 1.8;}
-        .info {color: #555;line-height: 1.7;}
-        .message {color: #555;}
+        .card {flex: 1;background: #2a2a2a;border: 1px solid #444444; border-radius: 2px;padding: 20px;margin-top: 20px;}
+        .card h2 {margin-top: 0;font-size: 18px;color : #e0a030;}
+        .value {font-size: 25px;color : #e4e1da}
+        .details {color: #9a968c;line-height: 1.8;}
+        .info {color: #9a968c;line-height: 1.7;}
+        .message {color: #9a968c;}
         .online {color: #55aa55 !important;}
         .offline {color: #cc5555 !important;}
-        table {width: 100%;border-collapse: collapse;margin-top: 10px;background: white;}
-        th,td {border: 1px solid #bbb;padding: 10px;text-align: center;}
-        th {background: #dddddd;}
-        td {background: #f8f8f8;}
+        table {width: 100%;border-collapse: collapse;margin-top: 10px;background: #1e1e1e;}
+        th,td {border: 1px solid #444444;padding: 10px;text-align: center;}
+        th {background: #2a2a2a;color : #e0a030;}
+        td {background: #1e1e1e;color: #e4e1da;}
         #v3Module {display: none;}
         #telemetryFigure {width: 100%; margin-top: 15px;}
 
